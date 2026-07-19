@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:spendmate/providers/budget_provider.dart';
 import 'package:spendmate/providers/settings_provider.dart';
 import 'package:spendmate/constants/app_constants.dart';
 import 'package:mockito/mockito.dart';

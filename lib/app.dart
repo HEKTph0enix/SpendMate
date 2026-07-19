@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+// Legacy providers
 import 'providers/expense_provider.dart';
 import 'providers/group_provider.dart';
 import 'providers/statistics_provider.dart';
@@ -8,13 +9,23 @@ import 'providers/budget_provider.dart';
 import 'providers/settings_provider.dart';
 import 'providers/theme_provider.dart';
 
+// New providers
+import 'providers/financial_dashboard_provider.dart';
+import 'providers/cash_wallet_provider.dart';
+import 'providers/analytics_provider.dart';
+import 'providers/savings_provider.dart';
+
 import 'theme/app_theme.dart';
 import 'constants/app_constants.dart';
 
-import 'screens/home/home_screen.dart';
-import 'screens/statistics/statistics_screen.dart';
+// Legacy screens
 import 'screens/groups/groups_screen.dart';
 import 'screens/settings/settings_screen.dart';
+
+// New screens
+import 'screens/dashboard_screen.dart';
+import 'screens/enhanced_statistics_screen.dart';
+import 'screens/savings_screen.dart';
 
 class SpendMateApp extends StatelessWidget {
   const SpendMateApp({super.key});
@@ -23,6 +34,7 @@ class SpendMateApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
+        // Legacy providers
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => SettingsProvider()..initialize()),
         ChangeNotifierProvider(create: (_) => ExpenseProvider()..loadExpenses()),
@@ -35,6 +47,12 @@ class SpendMateApp extends StatelessWidget {
           create: (context) => StatisticsProvider(Provider.of<SettingsProvider>(context, listen: false)),
           update: (context, settings, previous) => previous ?? StatisticsProvider(settings),
         ),
+        
+        // New providers
+        ChangeNotifierProvider(create: (_) => FinancialDashboardProvider()),
+        ChangeNotifierProvider(create: (_) => CashWalletProvider()),
+        ChangeNotifierProvider(create: (_) => AnalyticsProvider()),
+        ChangeNotifierProvider(create: (_) => SavingsProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
@@ -63,8 +81,9 @@ class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
-    const HomeScreen(),
-    const StatisticsScreen(),
+    const DashboardScreen(),
+    const EnhancedStatisticsScreen(),
+    const SavingsScreen(),
     const GroupsScreen(),
     const SettingsScreen(),
   ];
@@ -85,14 +104,19 @@ class _MainScreenState extends State<MainScreen> {
         },
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
-            label: 'Home',
+            icon: Icon(Icons.dashboard_outlined),
+            selectedIcon: Icon(Icons.dashboard),
+            label: 'Dashboard',
           ),
           NavigationDestination(
-            icon: Icon(Icons.bar_chart_outlined),
-            selectedIcon: Icon(Icons.bar_chart),
-            label: 'Statistics',
+            icon: Icon(Icons.analytics_outlined),
+            selectedIcon: Icon(Icons.analytics),
+            label: 'Insights',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.lightbulb_outline),
+            selectedIcon: Icon(Icons.lightbulb),
+            label: 'Savings',
           ),
           NavigationDestination(
             icon: Icon(Icons.group_outlined),

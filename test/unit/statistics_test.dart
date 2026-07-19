@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:spendmate/models/expense.dart';
 import 'package:spendmate/utils/date_formatter.dart';
 
 void main() {

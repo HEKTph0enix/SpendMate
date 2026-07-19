@@ -14,6 +14,7 @@ import '../../utils/csv_exporter.dart';
 import '../../utils/backup_manager.dart';
 import '../../utils/sample_data.dart';
 import '../budget/budget_screen.dart';
+import '../bank_accounts_screen.dart';
 import 'about_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -79,6 +80,7 @@ class SettingsScreen extends StatelessWidget {
       if (secondConfirm == true && context.mounted) {
         final db = DatabaseHelper();
         await db.clearAllData();
+        await db.clearFinancialData();
         
         if (context.mounted) {
           Provider.of<ExpenseProvider>(context, listen: false).loadExpenses();
@@ -185,6 +187,17 @@ class SettingsScreen extends StatelessWidget {
           const Divider(),
 
           // Preferences
+          ListTile(
+            leading: const Icon(Icons.account_balance_outlined),
+            title: const Text('Bank Accounts'),
+            subtitle: const Text('Manage linked accounts'),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const BankAccountsScreen()),
+              );
+            },
+          ),
           ListTile(
             leading: const Icon(Icons.account_balance_wallet_outlined),
             title: const Text('Monthly Budget'),

@@ -26,6 +26,7 @@ class DatabaseHelper {
       path,
       version: AppConstants.dbVersion,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       },
@@ -33,6 +34,8 @@ class DatabaseHelper {
   }
 
   Future<void> _onCreate(Database db, int version) async {
+    // ─── V1 Tables (original) ───────────────────────────────────────
+
     await db.execute('''
       CREATE TABLE users (
         id TEXT PRIMARY KEY,
@@ -123,7 +126,7 @@ class DatabaseHelper {
       )
     ''');
 
-    // Create indexes for performance
+    // V1 indexes
     await db.execute('CREATE INDEX idx_expenses_date ON expenses (date_time)');
     await db.execute('CREATE INDEX idx_expenses_category ON expenses (category)');
     await db.execute('CREATE INDEX idx_expenses_group ON expenses (group_id)');
@@ -131,6 +134,80 @@ class DatabaseHelper {
     await db.execute('CREATE INDEX idx_group_splits_expense ON group_splits (expense_id)');
     await db.execute('CREATE INDEX idx_settlements_group ON settlements (group_id)');
     await db.execute('CREATE UNIQUE INDEX idx_budgets_month_year ON budgets (month, year)');
+
+    // ─── V2 Tables (financial dashboard) ────────────────────────────
+
+    await _createV2Tables(db);
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await _createV2Tables(db);
+    }
+  }
+
+  Future<void> _createV2Tables(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS financial_accounts (
+        id TEXT PRIMARY KEY,
+        name TEXT NOT NULL,
+        type TEXT NOT NULL,
+        bank_name TEXT,
+        masked_account_number TEXT,
+        balance REAL NOT NULL DEFAULT 0,
+        last_synced_at TEXT,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS cash_wallet (
+        id TEXT PRIMARY KEY,
+        balance REAL NOT NULL DEFAULT 0,
+        last_updated_at TEXT NOT NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS transactions (
+        id TEXT PRIMARY KEY,
+        amount REAL NOT NULL,
+        type TEXT NOT NULL,
+        category TEXT NOT NULL,
+        payment_method TEXT NOT NULL,
+        source TEXT NOT NULL DEFAULT 'manual',
+        date TEXT NOT NULL,
+        note TEXT,
+        account_id TEXT,
+        is_recurring INTEGER NOT NULL DEFAULT 0,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        FOREIGN KEY (account_id) REFERENCES financial_accounts (id) ON DELETE SET NULL
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS recurring_expenses (
+        id TEXT PRIMARY KEY,
+        description TEXT NOT NULL,
+        amount REAL NOT NULL,
+        category TEXT NOT NULL,
+        frequency TEXT NOT NULL DEFAULT 'monthly',
+        last_occurrence TEXT,
+        next_expected TEXT,
+        is_active INTEGER NOT NULL DEFAULT 1,
+        created_at TEXT NOT NULL
+      )
+    ''');
+
+    // V2 indexes
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions (date)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_account ON transactions (account_id)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions (category)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions (type)');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_financial_accounts_active ON financial_accounts (is_active)');
   }
 
   // ─── Generic CRUD ──────────────────────────────────────────────────
@@ -205,7 +282,18 @@ class DatabaseHelper {
     });
   }
 
-  // ─── Clear all data ────────────────────────────────────────────────
+  // ─── Bulk insert for imported transactions ─────────────────────────
+
+  Future<void> insertBulkTransactions(List<Map<String, dynamic>> transactions) async {
+    final db = await database;
+    await db.transaction((txn) async {
+      for (final tx in transactions) {
+        await txn.insert('transactions', tx, conflictAlgorithm: ConflictAlgorithm.replace);
+      }
+    });
+  }
+
+  // ─── Clear all data (original) ────────────────────────────────────
 
   Future<void> clearAllData() async {
     final db = await database;
@@ -221,6 +309,18 @@ class DatabaseHelper {
     });
   }
 
+  // ─── Clear financial data only (new) ──────────────────────────────
+
+  Future<void> clearFinancialData() async {
+    final db = await database;
+    await db.transaction((txn) async {
+      await txn.delete('transactions');
+      await txn.delete('recurring_expenses');
+      await txn.delete('financial_accounts');
+      await txn.delete('cash_wallet');
+    });
+  }
+
   // ─── Full clear including user ─────────────────────────────────────
 
   Future<void> clearEverything() async {
@@ -232,6 +332,10 @@ class DatabaseHelper {
       await txn.delete('expenses');
       await txn.delete('expense_groups');
       await txn.delete('budgets');
+      await txn.delete('transactions');
+      await txn.delete('recurring_expenses');
+      await txn.delete('financial_accounts');
+      await txn.delete('cash_wallet');
       await txn.delete('users');
     });
   }
@@ -242,3 +346,4 @@ class DatabaseHelper {
     _database = null;
   }
 }
+
