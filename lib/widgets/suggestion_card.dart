@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/savings_suggestion.dart';
+import 'neumorphic/neumorphic_card.dart';
+import 'neumorphic/neumorphic_icon_button.dart';
+import 'neumorphic/neumorphic_container.dart';
 
 class SuggestionCard extends StatelessWidget {
   final SavingsSuggestion suggestion;
@@ -31,10 +34,8 @@ class SuggestionCard extends StatelessWidget {
         break;
     }
 
-    return Card(
+    return NeumorphicCard(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -53,27 +54,21 @@ class SuggestionCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.close, size: 20, color: Colors.grey),
+                NeumorphicIconButton(
+                  icon: Icons.close,
                   onPressed: onDismiss,
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
                 ),
               ],
             ),
             const SizedBox(height: 12),
             Text(
               suggestion.reason,
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
+              style: TextStyle(fontSize: 14, color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87),
             ),
             const SizedBox(height: 12),
-            Container(
+            NeumorphicContainer(
+              isInset: true,
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.05),
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue.withOpacity(0.2)),
-              ),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -82,7 +77,7 @@ class SuggestionCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       suggestion.recommendedAction,
-                      style: const TextStyle(fontSize: 13, color: Colors.black87),
+                      style: TextStyle(fontSize: 13, color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87),
                     ),
                   ),
                 ],

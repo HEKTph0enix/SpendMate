@@ -7,6 +7,8 @@ import '../../widgets/group_card.dart';
 import '../../widgets/empty_state.dart';
 import 'create_group_screen.dart';
 import 'group_detail_screen.dart';
+import '../../widgets/neumorphic/neumorphic_button.dart';
+import '../../widgets/neumorphic/neumorphic_icon_button.dart';
 
 class GroupsScreen extends StatelessWidget {
   const GroupsScreen({super.key});
@@ -17,12 +19,13 @@ class GroupsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Groups'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
+          NeumorphicIconButton(
+            icon: Icons.search,
             onPressed: () {
               // Search groups (simplified for now)
             },
           ),
+          const SizedBox(width: 8),
         ],
       ),
       body: Consumer2<GroupProvider, SettingsProvider>(
@@ -93,10 +96,19 @@ class GroupsScreen extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _navigateToCreateGroup(context),
-        icon: const Icon(Icons.group_add),
-        label: const Text('New Group'),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 16.0),
+        child: NeumorphicButton(
+          onPressed: () => _navigateToCreateGroup(context),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(Icons.group_add),
+              SizedBox(width: 8),
+              Text('New Group', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ),
       ),
     );
   }

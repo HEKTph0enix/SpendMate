@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../models/expense_group.dart';
 import '../utils/currency_formatter.dart';
 import '../utils/date_formatter.dart';
+import 'neumorphic/neumorphic_card.dart';
+import 'neumorphic/neumorphic_container.dart';
 
 class GroupCard extends StatelessWidget {
   final ExpenseGroup group;
@@ -44,14 +46,12 @@ class GroupCard extends StatelessWidget {
       balanceText = 'You owe\n${CurrencyFormatter.format(balanceAmount)}';
     }
 
-    return Card(
+    return NeumorphicCard(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -89,12 +89,10 @@ class GroupCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: 16),
-                  Container(
+                  NeumorphicContainer(
+                    isInset: true,
+                    borderRadius: 8,
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: balanceColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
                     child: Text(
                       balanceText,
                       textAlign: TextAlign.right,
@@ -135,7 +133,6 @@ class GroupCard extends StatelessWidget {
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }

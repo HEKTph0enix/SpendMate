@@ -6,6 +6,10 @@ import '../../providers/statistics_provider.dart';
 import '../../utils/currency_formatter.dart';
 import '../../utils/date_formatter.dart';
 import '../../constants/categories.dart';
+import '../../widgets/neumorphic/neumorphic_stat_card.dart';
+import '../../widgets/neumorphic/neumorphic_card.dart';
+import '../../widgets/neumorphic/neumorphic_icon_button.dart';
+import '../../widgets/neumorphic/neumorphic_container.dart';
 
 class StatisticsScreen extends StatelessWidget {
   const StatisticsScreen({super.key});
@@ -31,8 +35,8 @@ class StatisticsScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.chevron_left),
+                  NeumorphicIconButton(
+                    icon: Icons.chevron_left,
                     onPressed: () {
                       final prev = DateTime(stats.selectedMonth.year, stats.selectedMonth.month - 1);
                       stats.setMonth(prev);
@@ -42,8 +46,8 @@ class StatisticsScreen extends StatelessWidget {
                     DateFormatter.formatMonthYear(stats.selectedMonth),
                     style: theme.textTheme.titleLarge,
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.chevron_right),
+                  NeumorphicIconButton(
+                    icon: Icons.chevron_right,
                     onPressed: () {
                       final next = DateTime(stats.selectedMonth.year, stats.selectedMonth.month + 1);
                       // Don't allow going to future months
@@ -74,22 +78,20 @@ class StatisticsScreen extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildStatCard(
-                        context,
-                        'Total Spending',
-                        CurrencyFormatter.format(stats.totalSpending),
-                        Icons.account_balance_wallet,
-                        theme.colorScheme.primary,
+                      child: NeumorphicStatCard(
+                        title: 'Total Spending',
+                        amount: CurrencyFormatter.format(stats.totalSpending),
+                        icon: Icons.account_balance_wallet,
+                        color: theme.colorScheme.primary,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: _buildStatCard(
-                        context,
-                        'Daily Average',
-                        CurrencyFormatter.format(stats.averageDaily),
-                        Icons.calendar_today,
-                        theme.colorScheme.secondary,
+                      child: NeumorphicStatCard(
+                        title: 'Daily Average',
+                        amount: CurrencyFormatter.format(stats.averageDaily),
+                        icon: Icons.calendar_today,
+                        color: theme.colorScheme.secondary,
                       ),
                     ),
                   ],
@@ -98,22 +100,20 @@ class StatisticsScreen extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(
-                      child: _buildStatCard(
-                        context,
-                        'Transactions',
-                        stats.transactionCount.toString(),
-                        Icons.receipt_long,
-                        theme.colorScheme.tertiary,
+                      child: NeumorphicStatCard(
+                        title: 'Transactions',
+                        amount: stats.transactionCount.toString(),
+                        icon: Icons.receipt_long,
+                        color: theme.colorScheme.tertiary,
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
-                      child: _buildStatCard(
-                        context,
-                        'Highest',
-                        CurrencyFormatter.formatCompact(stats.highestExpense),
-                        Icons.trending_up,
-                        Colors.orange,
+                      child: NeumorphicStatCard(
+                        title: 'Highest',
+                        amount: CurrencyFormatter.formatCompact(stats.highestExpense),
+                        icon: Icons.trending_up,
+                        color: Colors.orange,
                       ),
                     ),
                   ],
@@ -126,27 +126,29 @@ class StatisticsScreen extends StatelessWidget {
                   style: theme.textTheme.titleLarge,
                 ),
                 const SizedBox(height: 16),
-                SizedBox(
-                  height: 200,
-                  child: PieChart(
-                    PieChartData(
-                      sectionsSpace: 2,
-                      centerSpaceRadius: 40,
-                      sections: stats.categoryTotals.entries.map((entry) {
-                        final color = CategoryHelper.getColor(entry.key);
-                        final percentage = (entry.value / stats.totalSpending) * 100;
-                        return PieChartSectionData(
-                          color: color,
-                          value: entry.value,
-                          title: '${percentage.toStringAsFixed(0)}%',
-                          radius: 50,
-                          titleStyle: const TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        );
-                      }).toList(),
+                NeumorphicCard(
+                  child: SizedBox(
+                    height: 200,
+                    child: PieChart(
+                      PieChartData(
+                        sectionsSpace: 2,
+                        centerSpaceRadius: 40,
+                        sections: stats.categoryTotals.entries.map((entry) {
+                          final color = CategoryHelper.getColor(entry.key);
+                          final percentage = (entry.value / stats.totalSpending) * 100;
+                          return PieChartSectionData(
+                            color: color,
+                            value: entry.value,
+                            title: '${percentage.toStringAsFixed(0)}%',
+                            radius: 50,
+                            titleStyle: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          );
+                        }).toList(),
+                      ),
                     ),
                   ),
                 ),
@@ -200,10 +202,25 @@ class StatisticsScreen extends StatelessWidget {
                           ],
                         ),
                         const SizedBox(height: 4),
-                        LinearProgressIndicator(
-                          value: percentage,
-                          backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                          valueColor: AlwaysStoppedAnimation<Color>(theme.colorScheme.primary),
+                        NeumorphicContainer(
+                          isInset: true,
+                          height: 8,
+                          borderRadius: 4,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                return Container(
+                                  width: constraints.maxWidth * percentage,
+                                  height: 8,
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primary,
+                                    borderRadius: BorderRadius.circular(4),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -218,39 +235,4 @@ class StatisticsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(BuildContext context, String title, String value, IconData icon, Color color) {
-    final theme = Theme.of(context);
-    return Card(
-      elevation: 0,
-      color: color.withOpacity(0.1),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: color.withOpacity(0.2)),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, size: 24, color: color),
-            const SizedBox(height: 12),
-            Text(
-              value,
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
-                color: theme.colorScheme.onSurface,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              title,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

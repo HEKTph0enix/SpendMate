@@ -5,7 +5,11 @@ import '../../providers/group_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../utils/currency_formatter.dart';
 import '../../utils/date_formatter.dart';
-import '../../widgets/expense_card.dart';
+import '../../widgets/neumorphic/neumorphic_expense_tile.dart';
+import '../../widgets/neumorphic/neumorphic_card.dart';
+import '../../widgets/neumorphic/neumorphic_container.dart';
+import '../../widgets/neumorphic/neumorphic_button.dart';
+import '../../widgets/neumorphic/neumorphic_icon_button.dart';
 import '../../widgets/confirm_dialog.dart';
 import 'add_group_expense_screen.dart';
 import 'create_group_screen.dart';
@@ -81,8 +85,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> with SingleTicker
           appBar: AppBar(
             title: Text(group.name),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.edit),
+              NeumorphicIconButton(
+                icon: Icons.edit,
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -92,10 +96,12 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> with SingleTicker
                   );
                 },
               ),
-              IconButton(
-                icon: const Icon(Icons.delete),
+              const SizedBox(width: 8),
+              NeumorphicIconButton(
+                icon: Icons.delete,
                 onPressed: _deleteGroup,
               ),
+              const SizedBox(width: 8),
             ],
             bottom: TabBar(
               controller: _tabController,
@@ -109,17 +115,10 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> with SingleTicker
           body: Column(
             children: [
               // Group Header Summary
-              Container(
-                width: double.infinity,
+              NeumorphicContainer(
+                isInset: true,
                 padding: const EdgeInsets.all(24.0),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.surfaceContainerHighest.withOpacity(0.3),
-                  border: Border(
-                    bottom: BorderSide(
-                      color: theme.colorScheme.outline.withOpacity(0.1),
-                    ),
-                  ),
-                ),
+                borderRadius: 0,
                 child: Column(
                   children: [
                     Text(
@@ -161,7 +160,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> with SingleTicker
               child: Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton(
+                    child: NeumorphicButton(
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -170,12 +169,12 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> with SingleTicker
                           ),
                         );
                       },
-                      child: const Text('Settle Up'),
+                      child: const Center(child: Text('Settle Up', style: TextStyle(fontWeight: FontWeight.bold))),
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: ElevatedButton(
+                    child: NeumorphicButton(
                       onPressed: () {
                         Navigator.push(
                           context,
@@ -184,7 +183,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> with SingleTicker
                           ),
                         );
                       },
-                      child: const Text('Add Expense'),
+                      child: const Center(child: Text('Add Expense', style: TextStyle(fontWeight: FontWeight.bold))),
                     ),
                   ),
                 ],
@@ -206,8 +205,8 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> with SingleTicker
       itemCount: provider.activeGroupExpenses.length,
       itemBuilder: (context, index) {
         final expense = provider.activeGroupExpenses[index];
-        return ExpenseCard(
-          expense: expense,
+        return NeumorphicExpenseTile(
+          item: expense,
           onTap: () {
             Navigator.push(
               context,
@@ -280,7 +279,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> with SingleTicker
             final fromName = fromUser.id == currentUserId ? 'You' : fromUser.name;
             final toName = toUser.id == currentUserId ? 'You' : toUser.name;
             
-            return Card(
+            return NeumorphicCard(
               margin: const EdgeInsets.only(bottom: 8),
               child: ListTile(
                 leading: Icon(Icons.compare_arrows, color: theme.colorScheme.primary),
@@ -312,7 +311,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> with SingleTicker
         final fromUser = users.firstWhere((u) => u.id == settlement.paidByUserId, orElse: () => users.first);
         final toUser = users.firstWhere((u) => u.id == settlement.paidToUserId, orElse: () => users.first);
 
-        return Card(
+        return NeumorphicCard(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
           child: ListTile(
             leading: const Icon(Icons.handshake),

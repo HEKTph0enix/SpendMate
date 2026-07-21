@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/cash_wallet_provider.dart';
 import '../widgets/transaction_tile.dart';
+import '../widgets/neumorphic/neumorphic_container.dart';
+import '../widgets/neumorphic/neumorphic_button.dart';
 
 class CashWalletScreen extends StatelessWidget {
   const CashWalletScreen({Key? key}) : super(key: key);
@@ -20,10 +22,10 @@ class CashWalletScreen extends StatelessWidget {
 
           return Column(
             children: [
-              Container(
-                width: double.infinity,
+              NeumorphicContainer(
+                isInset: true,
+                borderRadius: 0,
                 padding: const EdgeInsets.all(32),
-                color: Colors.teal.withOpacity(0.1),
                 child: Column(
                   children: [
                     const Icon(Icons.account_balance_wallet, size: 48, color: Colors.teal),
@@ -42,22 +44,30 @@ class CashWalletScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     Expanded(
-                      child: ElevatedButton.icon(
-                        icon: const Icon(Icons.add),
-                        label: const Text('Add Cash'),
+                      child: NeumorphicButton(
                         onPressed: () => _showAddCashDialog(context, provider),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.teal,
-                          foregroundColor: Colors.white,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.add, color: Colors.teal),
+                            SizedBox(width: 8),
+                            Text('Add Cash', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.teal)),
+                          ],
                         ),
                       ),
                     ),
                     const SizedBox(width: 16),
                     Expanded(
-                      child: OutlinedButton.icon(
-                        icon: const Icon(Icons.edit),
-                        label: const Text('Correct'),
+                      child: NeumorphicButton(
                         onPressed: () => _showCorrectBalanceDialog(context, provider),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(Icons.edit),
+                            SizedBox(width: 8),
+                            Text('Correct', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ],
+                        ),
                       ),
                     ),
                   ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'neumorphic/neumorphic_container.dart';
 
 class FilterBar extends StatelessWidget {
   final List<String> filters;
@@ -25,15 +26,24 @@ class FilterBar extends StatelessWidget {
           final filter = filters[index];
           final isActive = filter == activeFilter;
           
-          return ChoiceChip(
-            label: Text(filter),
-            selected: isActive,
-            onSelected: (selected) {
-              if (selected) {
+          return GestureDetector(
+            onTap: () {
+              if (!isActive) {
                 onFilterChanged(filter);
               }
             },
-            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: NeumorphicContainer(
+              isInset: isActive,
+              borderRadius: 20,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                filter,
+                style: TextStyle(
+                  color: isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
+                  fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+            ),
           );
         },
       ),

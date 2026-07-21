@@ -86,6 +86,7 @@ class AppConstants {
   static const String txSourceSms = 'sms';
   static const String txSourceImport = 'import';
   static const String txSourceBankSync = 'bankSync';
+  static const String txSourceUpiIntent = 'upi_intent';
 
   // Recurring expense detection thresholds
   static const double recurringAmountTolerance = 0.05; // ±5%
@@ -100,7 +101,7 @@ class AppConstants {
 
   // Database
   static const String dbName = 'spendmate.db';
-  static const int dbVersion = 2;
+  static const int dbVersion = 3;
 
   // Rounding tolerance for settlements
   static const double settlementTolerance = 0.01;

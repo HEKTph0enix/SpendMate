@@ -16,6 +16,8 @@ import '../../utils/sample_data.dart';
 import '../budget/budget_screen.dart';
 import '../bank_accounts_screen.dart';
 import 'about_screen.dart';
+import '../../widgets/neumorphic/neumorphic_toggle.dart';
+import '../../widgets/neumorphic/neumorphic_text_field.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -214,7 +216,7 @@ class SettingsScreen extends StatelessWidget {
               return ListTile(
                 leading: const Icon(Icons.dark_mode_outlined),
                 title: const Text('Dark Mode'),
-                trailing: Switch(
+                trailing: NeumorphicToggle(
                   value: themeProvider.isDark,
                   onChanged: (val) {
                     themeProvider.toggleTheme();
@@ -273,9 +275,9 @@ class SettingsScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Edit Name'),
-        content: TextField(
+        content: NeumorphicTextField(
           controller: controller,
-          decoration: const InputDecoration(labelText: 'Name'),
+          labelText: 'Name',
           textCapitalization: TextCapitalization.words,
         ),
         actions: [

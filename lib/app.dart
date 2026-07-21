@@ -15,9 +15,10 @@ import 'providers/cash_wallet_provider.dart';
 import 'providers/analytics_provider.dart';
 import 'providers/savings_provider.dart';
 
-import 'theme/app_theme.dart';
+import 'core/theme/app_theme.dart';
 import 'constants/app_constants.dart';
-
+import 'widgets/neumorphic/neumorphic_bottom_navigation.dart';
+import 'screens/expenses/add_expense_screen.dart';
 // Legacy screens
 import 'screens/groups/groups_screen.dart';
 import 'screens/settings/settings_screen.dart';
@@ -95,40 +96,19 @@ class _MainScreenState extends State<MainScreen> {
         index: _currentIndex,
         children: _screens,
       ),
-      bottomNavigationBar: NavigationBar(
+      bottomNavigationBar: NeumorphicBottomNavigation(
         selectedIndex: _currentIndex,
-        onDestinationSelected: (index) {
+        onItemSelected: (index) {
           setState(() {
             _currentIndex = index;
           });
         },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.dashboard_outlined),
-            selectedIcon: Icon(Icons.dashboard),
-            label: 'Dashboard',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.analytics_outlined),
-            selectedIcon: Icon(Icons.analytics),
-            label: 'Insights',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.lightbulb_outline),
-            selectedIcon: Icon(Icons.lightbulb),
-            label: 'Savings',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.group_outlined),
-            selectedIcon: Icon(Icons.group),
-            label: 'Groups',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.settings_outlined),
-            selectedIcon: Icon(Icons.settings),
-            label: 'Settings',
-          ),
-        ],
+        onAddPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AddExpenseScreen()),
+          );
+        },
       ),
     );
   }

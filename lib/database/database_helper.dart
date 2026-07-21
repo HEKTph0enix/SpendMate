@@ -60,6 +60,11 @@ class DatabaseHelper {
         payer_user_id TEXT,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL,
+        payee_name TEXT,
+        upi_id TEXT,
+        transaction_ref TEXT,
+        payment_status TEXT DEFAULT 'completed',
+        source TEXT DEFAULT 'manual',
         FOREIGN KEY (group_id) REFERENCES expense_groups (id) ON DELETE SET NULL,
         FOREIGN KEY (payer_user_id) REFERENCES users (id) ON DELETE SET NULL
       )
@@ -144,6 +149,18 @@ class DatabaseHelper {
     if (oldVersion < 2) {
       await _createV2Tables(db);
     }
+    if (oldVersion < 3) {
+      await _createV3Columns(db);
+    }
+  }
+
+  /// V3 migration: add optional UPI / source columns to expenses table.
+  Future<void> _createV3Columns(Database db) async {
+    await db.execute('ALTER TABLE expenses ADD COLUMN payee_name TEXT');
+    await db.execute('ALTER TABLE expenses ADD COLUMN upi_id TEXT');
+    await db.execute('ALTER TABLE expenses ADD COLUMN transaction_ref TEXT');
+    await db.execute("ALTER TABLE expenses ADD COLUMN payment_status TEXT DEFAULT 'completed'");
+    await db.execute("ALTER TABLE expenses ADD COLUMN source TEXT DEFAULT 'manual'");
   }
 
   Future<void> _createV2Tables(Database db) async {

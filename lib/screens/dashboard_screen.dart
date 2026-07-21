@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/financial_dashboard_provider.dart';
 import '../providers/cash_wallet_provider.dart';
-import '../widgets/balance_card.dart';
-import '../widgets/transaction_tile.dart';
+import '../providers/expense_provider.dart';
+import '../widgets/neumorphic/neumorphic_stat_card.dart';
+import '../widgets/neumorphic/neumorphic_expense_tile.dart';
+import '../utils/currency_formatter.dart';
 import 'bank_accounts_screen.dart';
 import 'cash_wallet_screen.dart';
+import 'expenses/add_expense_screen.dart';
+import 'expenses/upi_payment_screen.dart';
+import 'expenses/expense_detail_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({Key? key}) : super(key: key);
+  const DashboardScreen({super.key});
 
   @override
   State<DashboardScreen> createState() => _DashboardScreenState();
@@ -22,6 +27,60 @@ class _DashboardScreenState extends State<DashboardScreen> {
       context.read<FinancialDashboardProvider>().refreshDashboard();
       context.read<CashWalletProvider>().refreshWallet();
     });
+  }
+
+  void _showAddExpenseOptions() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) {
+        final theme = Theme.of(context);
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Add Expense',
+                  style: theme.textTheme.titleLarge,
+                ),
+                const SizedBox(height: 16),
+                ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: theme.colorScheme.primaryContainer,
+                    child: Icon(Icons.edit, color: theme.colorScheme.primary),
+                  ),
+                  title: const Text('Manual Entry'),
+                  subtitle: const Text('Enter expense details manually'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const AddExpenseScreen()),
+                    );
+                  },
+                ),
+                ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: theme.colorScheme.secondaryContainer,
+                    child: Icon(Icons.account_balance, color: theme.colorScheme.secondary),
+                  ),
+                  title: const Text('Pay Using UPI'),
+                  subtitle: const Text('Pay via UPI and record the expense'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const UpiPaymentScreen()),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
@@ -62,11 +121,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: BalanceCard(
+                      child: NeumorphicStatCard(
                         title: 'Bank Accounts',
-                        amount: dashboard.totalBankBalance,
+                        amount: CurrencyFormatter.format(dashboard.totalBankBalance),
                         icon: Icons.account_balance,
-                        gradientColors: const [Colors.indigo, Colors.blueAccent],
+                        color: Colors.indigo,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -75,13 +134,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         },
                       ),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
                     Expanded(
-                      child: BalanceCard(
+                      child: NeumorphicStatCard(
                         title: 'Cash Wallet',
-                        amount: wallet.balance,
+                        amount: CurrencyFormatter.format(wallet.balance),
                         icon: Icons.account_balance_wallet,
-                        gradientColors: const [Colors.teal, Colors.green],
+                        color: Colors.teal,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -94,7 +153,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ),
                 const SizedBox(height: 32),
 
-                // Recent Transactions
+                // Recent Expenses from expenses table
+                _buildRecentExpensesSection(),
+                const SizedBox(height: 24),
+
+                // Recent Transactions from transactions table
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -126,12 +189,79 @@ class _DashboardScreenState extends State<DashboardScreen> {
                     ),
                   )
                 else
-                  ...dashboard.recentTransactions.map((tx) => TransactionTile(transaction: tx)),
+                  ...dashboard.recentTransactions.map((tx) => NeumorphicExpenseTile(item: tx)),
+
+                const SizedBox(height: 80), // Space for FAB
               ],
             ),
           );
         },
       ),
+    );
+  }
+
+  Widget _buildRecentExpensesSection() {
+    return Consumer<ExpenseProvider>(
+      builder: (context, expenseProvider, child) {
+        final recent = expenseProvider.recentExpenses;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Recent Expenses',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                if (recent.isNotEmpty)
+                  TextButton(
+                    onPressed: () {
+                      // TODO: Navigate to all expenses
+                    },
+                    child: const Text('See All'),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (recent.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(
+                        Icons.receipt_long_outlined,
+                        size: 48,
+                        color: Colors.grey.shade400,
+                      ),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'No expenses yet. Tap + to add one!',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              ...recent.take(5).map((expense) => NeumorphicExpenseTile(
+                item: expense,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => ExpenseDetailScreen(expenseId: expense.id),
+                    ),
+                  );
+                },
+              )),
+          ],
+        );
+      },
     );
   }
 

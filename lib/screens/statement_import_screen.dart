@@ -6,6 +6,9 @@ import 'package:provider/provider.dart';
 import '../services/statement_import_service.dart';
 import '../models/transaction.dart' as app;
 import '../providers/financial_dashboard_provider.dart';
+import '../widgets/neumorphic/neumorphic_card.dart';
+import '../widgets/neumorphic/neumorphic_button.dart';
+import '../widgets/neumorphic/neumorphic_container.dart';
 
 class StatementImportScreen extends StatefulWidget {
   const StatementImportScreen({Key? key}) : super(key: key);
@@ -80,7 +83,7 @@ class _StatementImportScreenState extends State<StatementImportScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Card(
+            const NeumorphicCard(
               child: Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Column(
@@ -103,12 +106,15 @@ class _StatementImportScreenState extends State<StatementImportScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            ElevatedButton.icon(
-              icon: const Icon(Icons.upload_file),
-              label: const Text('Select CSV File'),
-              onPressed: _isLoading ? null : _pickAndParseFile,
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
+            NeumorphicButton(
+              onPressed: _isLoading ? null : () => _pickAndParseFile(),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: const [
+                  Icon(Icons.upload_file),
+                  SizedBox(width: 8),
+                  Text('Select CSV File', style: TextStyle(fontWeight: FontWeight.bold)),
+                ],
               ),
             ),
             const SizedBox(height: 24),
@@ -136,13 +142,10 @@ class _StatementImportScreenState extends State<StatementImportScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
+        NeumorphicContainer(
+          isInset: true,
           padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.green.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.green),
-          ),
+          borderRadius: 8,
           child: Row(
             children: [
               const Icon(Icons.check_circle, color: Colors.green),
@@ -186,14 +189,14 @@ class _StatementImportScreenState extends State<StatementImportScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        ElevatedButton(
+        NeumorphicButton(
           onPressed: _saveTransactions,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.indigo,
-            foregroundColor: Colors.white,
-            minimumSize: const Size(double.infinity, 50),
+          child: Center(
+            child: Text(
+              'Save ${_result!.parsedCount} Transactions',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
-          child: Text('Save ${_result!.parsedCount} Transactions'),
         ),
       ],
     );

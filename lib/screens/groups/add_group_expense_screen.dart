@@ -10,6 +10,8 @@ import '../../constants/app_constants.dart';
 import '../../constants/categories.dart';
 import '../../utils/split_calculator.dart';
 import '../../utils/validators.dart';
+import '../../widgets/neumorphic/neumorphic_text_field.dart';
+import '../../widgets/neumorphic/neumorphic_dropdown.dart';
 
 class AddGroupExpenseScreen extends StatefulWidget {
   final String groupId;
@@ -185,14 +187,11 @@ class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen> with Sing
           padding: const EdgeInsets.all(16.0),
           children: [
             // Amount
-            TextFormField(
+            NeumorphicTextField(
               controller: _amountController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: 'Total Amount',
-                prefixText: '₹ ',
-                prefixStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+              labelText: 'Total Amount',
+              prefixText: '₹ ',
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               validator: Validators.amount,
               onChanged: (_) => setState(() {}),
@@ -200,24 +199,20 @@ class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen> with Sing
             const SizedBox(height: 16),
             
             // Description
-            TextFormField(
+            NeumorphicTextField(
               controller: _descController,
-              decoration: const InputDecoration(
-                labelText: 'Description',
-                prefixIcon: Icon(Icons.description),
-              ),
+              labelText: 'Description',
+              prefixIcon: const Icon(Icons.description),
               textCapitalization: TextCapitalization.sentences,
               validator: (v) => Validators.required(v, 'Description'),
             ),
             const SizedBox(height: 16),
             
             // Paid By
-            DropdownButtonFormField<User>(
+            NeumorphicDropdown<User>(
               value: _payer,
-              decoration: const InputDecoration(
-                labelText: 'Paid By',
-                prefixIcon: Icon(Icons.person),
-              ),
+              labelText: 'Paid By',
+              prefixIcon: const Icon(Icons.person),
               items: users.map((user) {
                 return DropdownMenuItem(
                   value: user,
@@ -231,12 +226,10 @@ class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen> with Sing
             const SizedBox(height: 16),
             
             // Category (Simplified single line scroll)
-            DropdownButtonFormField<String>(
+            NeumorphicDropdown<String>(
               value: _selectedCategory,
-              decoration: const InputDecoration(
-                labelText: 'Category',
-                prefixIcon: Icon(Icons.category),
-              ),
+              labelText: 'Category',
+              prefixIcon: const Icon(Icons.category),
               items: AppConstants.categories.map((c) {
                 return DropdownMenuItem(value: c, child: Text(c));
               }).toList(),
@@ -271,29 +264,25 @@ class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen> with Sing
               if (_tabController.index == 1) { // Exact Amount
                 splitInput = SizedBox(
                   width: 100,
-                  child: TextFormField(
+                  child: NeumorphicTextField(
                     controller: _customControllers[user.id],
                     enabled: isIncluded,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      prefixText: '₹',
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                    ),
+                    prefixText: '₹',
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                   ),
                 );
               } else if (_tabController.index == 2) { // Percentage
                 splitInput = SizedBox(
                   width: 80,
-                  child: TextFormField(
+                  child: NeumorphicTextField(
                     controller: _percentControllers[user.id],
                     enabled: isIncluded,
                     keyboardType: TextInputType.number,
-                    decoration: const InputDecoration(
-                      suffixText: '%',
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8, vertical: 12),
-                    ),
+                    suffixText: '%',
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                   ),
                 );
               } else {

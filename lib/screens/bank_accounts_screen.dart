@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/financial_dashboard_provider.dart';
 import 'statement_import_screen.dart';
+import '../widgets/neumorphic/neumorphic_card.dart';
+import '../widgets/neumorphic/neumorphic_button.dart';
 
 class BankAccountsScreen extends StatelessWidget {
   const BankAccountsScreen({Key? key}) : super(key: key);
@@ -39,8 +41,9 @@ class BankAccountsScreen extends StatelessWidget {
             itemCount: provider.accounts.length,
             itemBuilder: (context, index) {
               final account = provider.accounts[index];
-              return Card(
+              return NeumorphicCard(
                 margin: const EdgeInsets.only(bottom: 16),
+                padding: EdgeInsets.zero,
                 child: ListTile(
                   leading: const CircleAvatar(
                     backgroundColor: Colors.indigo,
@@ -61,10 +64,19 @@ class BankAccountsScreen extends StatelessWidget {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddAccountDialog(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Add Account'),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 16.0),
+        child: NeumorphicButton(
+          onPressed: () => _showAddAccountDialog(context),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Icon(Icons.add),
+              SizedBox(width: 8),
+              Text('Add Account', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ),
       ),
     );
   }

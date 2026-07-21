@@ -104,4 +104,32 @@ class Validators {
     }
     return null;
   }
+
+  /// Validate UPI ID format (e.g. user@bank).
+  static String? upiId(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'UPI ID is required';
+    }
+    final trimmed = value.trim();
+    // Basic UPI ID format: something@something, no spaces
+    if (trimmed.contains(' ')) {
+      return 'UPI ID must not contain spaces';
+    }
+    final parts = trimmed.split('@');
+    if (parts.length != 2 || parts[0].isEmpty || parts[1].isEmpty) {
+      return 'Enter a valid UPI ID (e.g. name@upi)';
+    }
+    return null;
+  }
+
+  /// Validate payee name.
+  static String? payeeName(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Payee name is required';
+    }
+    if (value.trim().length < 2) {
+      return 'Payee name must be at least 2 characters';
+    }
+    return null;
+  }
 }

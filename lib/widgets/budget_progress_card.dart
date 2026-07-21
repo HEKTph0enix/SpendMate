@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../utils/currency_formatter.dart';
 import '../constants/app_constants.dart';
+import 'neumorphic/neumorphic_card.dart';
+import 'neumorphic/neumorphic_container.dart';
 
 class BudgetProgressCard extends StatelessWidget {
   final double limitAmount;
@@ -37,16 +39,14 @@ class BudgetProgressCard extends StatelessWidget {
       if (usagePercentage > 1.0) usagePercentage = 1.0;
     }
 
-    return Card(
+    return NeumorphicCard(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(16),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -116,19 +116,29 @@ class BudgetProgressCard extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 16),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: LinearProgressIndicator(
-                  value: usagePercentage,
-                  minHeight: 10,
-                  backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                  valueColor: AlwaysStoppedAnimation<Color>(statusColor),
+              NeumorphicContainer(
+                isInset: true,
+                height: 10,
+                borderRadius: 8,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: LayoutBuilder(
+                    builder: (context, constraints) {
+                      return Container(
+                        width: constraints.maxWidth * usagePercentage,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: statusColor,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
           ),
         ),
-      ),
-    );
+      );
   }
 }

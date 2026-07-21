@@ -3,6 +3,10 @@ import 'package:provider/provider.dart';
 import '../providers/analytics_provider.dart';
 import '../widgets/insight_badge.dart';
 import '../utils/date_formatter.dart';
+import '../utils/currency_formatter.dart';
+import '../widgets/neumorphic/neumorphic_stat_card.dart';
+import '../widgets/neumorphic/neumorphic_icon_button.dart';
+import '../widgets/neumorphic/neumorphic_container.dart';
 
 class EnhancedStatisticsScreen extends StatefulWidget {
   const EnhancedStatisticsScreen({Key? key}) : super(key: key);
@@ -41,8 +45,8 @@ class _EnhancedStatisticsScreenState extends State<EnhancedStatisticsScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.chevron_left),
+                  NeumorphicIconButton(
+                    icon: Icons.chevron_left,
                     onPressed: () {
                       final prev = DateTime(provider.selectedMonth.year, provider.selectedMonth.month - 1);
                       provider.setMonth(prev);
@@ -52,8 +56,8 @@ class _EnhancedStatisticsScreenState extends State<EnhancedStatisticsScreen> {
                     DateFormatter.formatMonthYear(provider.selectedMonth),
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.chevron_right),
+                  NeumorphicIconButton(
+                    icon: Icons.chevron_right,
                     onPressed: () {
                       final next = DateTime(provider.selectedMonth.year, provider.selectedMonth.month + 1);
                       provider.setMonth(next);
@@ -67,17 +71,19 @@ class _EnhancedStatisticsScreenState extends State<EnhancedStatisticsScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: _StatBox(
+                    child: NeumorphicStatCard(
                       title: 'Expenses',
-                      amount: stats.totalExpense,
+                      amount: CurrencyFormatter.format(stats.totalExpense),
+                      icon: Icons.arrow_upward,
                       color: Colors.red,
                     ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
-                    child: _StatBox(
+                    child: NeumorphicStatCard(
                       title: 'Income',
-                      amount: stats.totalIncome,
+                      amount: CurrencyFormatter.format(stats.totalIncome),
+                      icon: Icons.arrow_downward,
                       color: Colors.green,
                     ),
                   ),
@@ -131,33 +137,3 @@ class _EnhancedStatisticsScreenState extends State<EnhancedStatisticsScreen> {
   }
 }
 
-class _StatBox extends StatelessWidget {
-  final String title;
-  final double amount;
-  final Color color;
-
-  const _StatBox({required this.title, required this.amount, required this.color});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(title, style: TextStyle(color: color, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 8),
-          Text(
-            '₹${amount.toStringAsFixed(0)}',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: color),
-          ),
-        ],
-      ),
-    );
-  }
-}

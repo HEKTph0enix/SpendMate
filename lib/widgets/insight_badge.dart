@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/spending_insight.dart';
+import 'neumorphic/neumorphic_card.dart';
 
 class InsightBadge extends StatelessWidget {
   final SpendingInsight insight;
@@ -40,14 +41,10 @@ class InsightBadge extends StatelessWidget {
         break;
     }
 
-    return Container(
+    return NeumorphicCard(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: textColor.withOpacity(0.2)),
-      ),
+      customColor: bgColor,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -69,7 +66,7 @@ class InsightBadge extends StatelessWidget {
                 Text(
                   insight.description,
                   style: TextStyle(
-                    color: Colors.black87,
+                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
                     fontSize: 13,
                   ),
                 ),

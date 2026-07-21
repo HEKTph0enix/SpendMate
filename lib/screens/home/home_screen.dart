@@ -4,9 +4,9 @@ import 'package:provider/provider.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/budget_provider.dart';
 import '../../providers/settings_provider.dart';
-import '../../widgets/summary_card.dart';
+import '../../widgets/neumorphic/neumorphic_stat_card.dart';
+import '../../widgets/neumorphic/neumorphic_expense_tile.dart';
 import '../../widgets/budget_progress_card.dart';
-import '../../widgets/expense_card.dart';
 import '../../widgets/filter_bar.dart';
 import '../../widgets/empty_state.dart';
 import '../../utils/currency_formatter.dart';
@@ -52,7 +52,7 @@ class HomeScreen extends StatelessWidget {
                   child: Row(
                     children: [
                       Expanded(
-                        child: SummaryCard(
+                        child: NeumorphicStatCard(
                           title: 'Today',
                           amount: CurrencyFormatter.format(expenseProvider.totalToday),
                           icon: Icons.today,
@@ -61,7 +61,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Expanded(
-                        child: SummaryCard(
+                        child: NeumorphicStatCard(
                           title: 'This Week',
                           amount: CurrencyFormatter.format(expenseProvider.totalThisWeek),
                           icon: Icons.calendar_view_week,
@@ -150,8 +150,8 @@ class HomeScreen extends StatelessWidget {
                     (context, index) {
                       final expense = expenseProvider.expenses[index];
                       // If it's a group expense, show full amount but denote it's a group expense (logic handled in card)
-                      return ExpenseCard(
-                        expense: expense,
+                      return NeumorphicExpenseTile(
+                        item: expense,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -170,11 +170,6 @@ class HomeScreen extends StatelessWidget {
             ],
           );
         },
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _navigateToAddExpense(context),
-        icon: const Icon(Icons.add),
-        label: const Text('Add Expense'),
       ),
     );
   }

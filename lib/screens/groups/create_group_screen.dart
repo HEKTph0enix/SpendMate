@@ -7,6 +7,8 @@ import '../../models/user.dart';
 import '../../providers/group_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../utils/validators.dart';
+import '../../widgets/neumorphic/neumorphic_text_field.dart';
+import '../../widgets/neumorphic/neumorphic_icon_button.dart';
 
 class CreateGroupScreen extends StatefulWidget {
   final ExpenseGroup? groupToEdit;
@@ -166,24 +168,20 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           padding: const EdgeInsets.all(16.0),
           children: [
             // Group Name
-            TextFormField(
+            NeumorphicTextField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Group Name',
-                prefixIcon: Icon(Icons.group),
-              ),
+              labelText: 'Group Name',
+              prefixIcon: const Icon(Icons.group),
               textCapitalization: TextCapitalization.words,
               validator: Validators.groupName,
             ),
             const SizedBox(height: 24),
 
             // Description
-            TextFormField(
+            NeumorphicTextField(
               controller: _descController,
-              decoration: const InputDecoration(
-                labelText: 'Description (Optional)',
-                prefixIcon: Icon(Icons.description),
-              ),
+              labelText: 'Description (Optional)',
+              prefixIcon: const Icon(Icons.description),
               textCapitalization: TextCapitalization.sentences,
             ),
             const SizedBox(height: 32),
@@ -210,21 +208,19 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             Row(
               children: [
                 Expanded(
-                  child: TextField(
+                  child: NeumorphicTextField(
                     controller: _memberController,
-                    decoration: const InputDecoration(
-                      labelText: 'Add a person',
-                      hintText: 'e.g., Arun',
-                      prefixIcon: Icon(Icons.person_add),
-                    ),
+                    labelText: 'Add a person',
+                    hintText: 'e.g., Arun',
+                    prefixIcon: const Icon(Icons.person_add),
                     textCapitalization: TextCapitalization.words,
                     onSubmitted: (_) => _addMember(),
                   ),
                 ),
                 const SizedBox(width: 12),
-                IconButton.filled(
+                NeumorphicIconButton(
                   onPressed: _addMember,
-                  icon: const Icon(Icons.add),
+                  icon: Icons.add,
                 ),
               ],
             ),

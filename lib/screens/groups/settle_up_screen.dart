@@ -7,6 +7,8 @@ import '../../models/user.dart';
 import '../../providers/group_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../utils/validators.dart';
+import '../../widgets/neumorphic/neumorphic_text_field.dart';
+import '../../widgets/neumorphic/neumorphic_dropdown.dart';
 
 class SettleUpScreen extends StatefulWidget {
   final String groupId;
@@ -124,26 +126,21 @@ class _SettleUpScreenState extends State<SettleUpScreen> {
           padding: const EdgeInsets.all(16.0),
           children: [
             // Amount
-            TextFormField(
+            NeumorphicTextField(
               controller: _amountController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: 'Amount',
-                prefixText: '₹ ',
-                prefixStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+              labelText: 'Amount',
+              prefixText: '₹ ',
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               validator: Validators.amount,
             ),
             const SizedBox(height: 32),
             
             // Paid By
-            DropdownButtonFormField<User>(
+            NeumorphicDropdown<User>(
               value: _paidBy,
-              decoration: const InputDecoration(
-                labelText: 'Who Paid',
-                prefixIcon: Icon(Icons.arrow_upward, color: Colors.red),
-              ),
+              labelText: 'Who Paid',
+              prefixIcon: const Icon(Icons.arrow_upward, color: Colors.red),
               items: users.map((user) {
                 return DropdownMenuItem(value: user, child: Text(user.name));
               }).toList(),
@@ -158,12 +155,10 @@ class _SettleUpScreenState extends State<SettleUpScreen> {
             const SizedBox(height: 16),
             
             // Paid To
-            DropdownButtonFormField<User>(
+            NeumorphicDropdown<User>(
               value: _paidTo,
-              decoration: const InputDecoration(
-                labelText: 'Who Received',
-                prefixIcon: Icon(Icons.arrow_downward, color: Colors.green),
-              ),
+              labelText: 'Who Received',
+              prefixIcon: const Icon(Icons.arrow_downward, color: Colors.green),
               items: users.map((user) {
                 return DropdownMenuItem(value: user, child: Text(user.name));
               }).toList(),
@@ -174,12 +169,10 @@ class _SettleUpScreenState extends State<SettleUpScreen> {
             const SizedBox(height: 32),
             
             // Note
-            TextFormField(
+            NeumorphicTextField(
               controller: _noteController,
-              decoration: const InputDecoration(
-                labelText: 'Note (Optional)',
-                prefixIcon: Icon(Icons.notes),
-              ),
+              labelText: 'Note (Optional)',
+              prefixIcon: const Icon(Icons.notes),
               textCapitalization: TextCapitalization.sentences,
             ),
           ],

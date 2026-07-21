@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'neumorphic/neumorphic_button.dart';
+import 'neumorphic/neumorphic_container.dart';
 
 class EmptyState extends StatelessWidget {
   final IconData icon;
@@ -26,12 +28,9 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
+            NeumorphicContainer(
               padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withOpacity(0.5),
-                shape: BoxShape.circle,
-              ),
+              shape: BoxShape.circle,
               child: Icon(
                 icon,
                 size: 64,
@@ -56,10 +55,16 @@ class EmptyState extends StatelessWidget {
             ),
             if (buttonText != null && onButtonPressed != null) ...[
               const SizedBox(height: 32),
-              ElevatedButton.icon(
-                onPressed: onButtonPressed,
-                icon: const Icon(Icons.add),
-                label: Text(buttonText!),
+              NeumorphicButton(
+                onPressed: onButtonPressed!,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.add),
+                    const SizedBox(width: 8),
+                    Text(buttonText!, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
               ),
             ]
           ],

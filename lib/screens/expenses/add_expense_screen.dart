@@ -3,11 +3,16 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../providers/expense_provider.dart';
+import '../../providers/budget_provider.dart';
+import '../../providers/statistics_provider.dart';
 import '../../models/expense.dart';
 import '../../constants/app_constants.dart';
 import '../../constants/categories.dart';
 import '../../utils/date_formatter.dart';
-import '../../utils/validators.dart';
+import '../../widgets/neumorphic/neumorphic_text_field.dart';
+import '../../widgets/neumorphic/neumorphic_dropdown.dart';
+import '../../widgets/neumorphic/neumorphic_button.dart';
+import 'upi_payment_screen.dart';
 
 class AddExpenseScreen extends StatefulWidget {
   final Expense? expenseToEdit;
@@ -78,13 +83,24 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
     }
   }
 
-  void _saveExpense() async {
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+  Future<void> _saveExpense() async {
+    if (!_formKey.currentState!.validate()) return;
 
-      final amount = Validators.parseAmount(_amountController.text) ?? 0.0;
+    // Parse and validate amount using the recommended approach
+    final amount = double.tryParse(_amountController.text.trim());
+
+    if (amount == null || amount <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid amount greater than zero')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
       final dateTime = DateTime(
         _selectedDate.year,
         _selectedDate.month,
@@ -100,6 +116,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         category: _selectedCategory,
         paymentMethod: _selectedPaymentMethod,
         note: _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
+        source: widget.expenseToEdit?.source ?? 'manual',
         createdAt: widget.expenseToEdit?.createdAt,
       );
 
@@ -111,10 +128,60 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         await provider.addExpense(expense);
       }
 
-      if (mounted) {
+      if (!mounted) return;
+
+      // Refresh budget and statistics after saving
+      context.read<BudgetProvider>().loadCurrentBudget();
+      context.read<StatisticsProvider>().loadStatistics();
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(widget.expenseToEdit != null
+              ? 'Expense updated successfully'
+              : 'Expense added successfully'),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // Clear form for new expenses, pop for edits
+      if (widget.expenseToEdit != null) {
+        Navigator.pop(context);
+      } else {
+        // Clear the form after successful save
+        _amountController.clear();
+        _noteController.clear();
+        setState(() {
+          _selectedCategory = AppConstants.categories.first;
+          _selectedPaymentMethod = AppConstants.paymentMethods.first;
+          _selectedDate = DateTime.now();
+          _selectedTime = TimeOfDay.now();
+        });
+        _formKey.currentState?.reset();
         Navigator.pop(context);
       }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to save expense: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
+  }
+
+  void _navigateToUpiPayment() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const UpiPaymentScreen()),
+    );
   }
 
   @override
@@ -137,7 +204,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             )
           else
             TextButton(
-              onPressed: _saveExpense,
+              onPressed: _isLoading ? null : _saveExpense,
               child: const Text('SAVE'),
             ),
         ],
@@ -147,27 +214,66 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         child: ListView(
           padding: const EdgeInsets.all(16.0),
           children: [
+            // Pay via UPI button (only for new expenses, not when editing)
+            if (!isEditing) ...[
+              NeumorphicButton(
+                onPressed: _navigateToUpiPayment,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: const [
+                    Icon(Icons.account_balance),
+                    SizedBox(width: 8),
+                    Text('Pay Using UPI'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  const Expanded(child: Divider()),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(
+                      'OR ENTER MANUALLY',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ),
+                  const Expanded(child: Divider()),
+                ],
+              ),
+              const SizedBox(height: 16),
+            ],
+
             // Amount
-            TextFormField(
+            NeumorphicTextField(
               controller: _amountController,
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(
-                labelText: 'Amount',
-                prefixText: '₹ ',
-                prefixStyle: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
+              labelText: 'Amount',
+              prefixText: '₹ ',
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              validator: Validators.amount,
+              validator: (value) {
+                if (value == null || value.trim().isEmpty) {
+                  return 'Amount is required';
+                }
+                final parsed = double.tryParse(value.trim());
+                if (parsed == null) {
+                  return 'Enter a valid amount';
+                }
+                if (parsed <= 0) {
+                  return 'Amount must be greater than zero';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 24),
 
             // Note
-            TextFormField(
+            NeumorphicTextField(
               controller: _noteController,
-              decoration: const InputDecoration(
-                labelText: 'Note (Optional)',
-                prefixIcon: Icon(Icons.notes),
-              ),
+              labelText: 'Note (Optional)',
+              prefixIcon: const Icon(Icons.notes),
               textCapitalization: TextCapitalization.sentences,
             ),
             const SizedBox(height: 24),
@@ -207,12 +313,10 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             const SizedBox(height: 24),
 
             // Payment Method
-            DropdownButtonFormField<String>(
+            NeumorphicDropdown<String>(
               value: _selectedPaymentMethod,
-              decoration: const InputDecoration(
-                labelText: 'Payment Method',
-                prefixIcon: Icon(Icons.account_balance_wallet),
-              ),
+              labelText: 'Payment Method',
+              prefixIcon: const Icon(Icons.account_balance_wallet),
               items: AppConstants.paymentMethods.map((method) {
                 return DropdownMenuItem(
                   value: method,

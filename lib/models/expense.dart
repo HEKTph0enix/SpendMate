@@ -13,6 +13,13 @@ class Expense {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  // UPI / source tracking fields (optional, added in V3)
+  final String? payeeName;
+  final String? upiId;
+  final String? transactionRef;
+  final String paymentStatus;
+  final String source;
+
   Expense({
     required this.id,
     required this.amount,
@@ -23,6 +30,11 @@ class Expense {
     this.isGroupExpense = false,
     this.groupId,
     this.payerUserId,
+    this.payeeName,
+    this.upiId,
+    this.transactionRef,
+    this.paymentStatus = 'completed',
+    this.source = 'manual',
     DateTime? createdAt,
     DateTime? updatedAt,
   })  : createdAt = createdAt ?? DateTime.now(),
@@ -41,6 +53,11 @@ class Expense {
       'payer_user_id': payerUserId,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
+      'payee_name': payeeName,
+      'upi_id': upiId,
+      'transaction_ref': transactionRef,
+      'payment_status': paymentStatus,
+      'source': source,
     };
   }
 
@@ -57,6 +74,11 @@ class Expense {
       payerUserId: map['payer_user_id'] as String?,
       createdAt: DateTime.parse(map['created_at'] as String),
       updatedAt: DateTime.parse(map['updated_at'] as String),
+      payeeName: map['payee_name'] as String?,
+      upiId: map['upi_id'] as String?,
+      transactionRef: map['transaction_ref'] as String?,
+      paymentStatus: (map['payment_status'] as String?) ?? 'completed',
+      source: (map['source'] as String?) ?? 'manual',
     );
   }
 
@@ -70,6 +92,11 @@ class Expense {
     bool? isGroupExpense,
     String? groupId,
     String? payerUserId,
+    String? payeeName,
+    String? upiId,
+    String? transactionRef,
+    String? paymentStatus,
+    String? source,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -83,6 +110,11 @@ class Expense {
       isGroupExpense: isGroupExpense ?? this.isGroupExpense,
       groupId: groupId ?? this.groupId,
       payerUserId: payerUserId ?? this.payerUserId,
+      payeeName: payeeName ?? this.payeeName,
+      upiId: upiId ?? this.upiId,
+      transactionRef: transactionRef ?? this.transactionRef,
+      paymentStatus: paymentStatus ?? this.paymentStatus,
+      source: source ?? this.source,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? DateTime.now(),
     );
@@ -94,5 +126,5 @@ class Expense {
 
   @override
   String toString() =>
-      'Expense(id: $id, amount: $amount, category: $category, isGroup: $isGroupExpense)';
+      'Expense(id: $id, amount: $amount, category: $category, isGroup: $isGroupExpense, source: $source)';
 }

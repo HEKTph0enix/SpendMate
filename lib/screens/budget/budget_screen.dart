@@ -5,6 +5,9 @@ import '../../providers/budget_provider.dart';
 import '../../utils/currency_formatter.dart';
 import '../../utils/validators.dart';
 import '../../constants/app_constants.dart';
+import '../../widgets/neumorphic/neumorphic_text_field.dart';
+import '../../widgets/neumorphic/neumorphic_card.dart';
+import '../../widgets/neumorphic/neumorphic_container.dart';
 
 class BudgetScreen extends StatefulWidget {
   const BudgetScreen({super.key});
@@ -87,14 +90,11 @@ class _BudgetScreenState extends State<BudgetScreen> {
                 ),
                 const SizedBox(height: 32),
                 
-                TextFormField(
+                NeumorphicTextField(
                   controller: _amountController,
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  decoration: const InputDecoration(
-                    labelText: 'Budget Amount',
-                    prefixText: '₹ ',
-                    prefixStyle: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-                  ),
+                  labelText: 'Budget Amount',
+                  prefixText: '₹ ',
                   style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   validator: Validators.amount,
                 ),
@@ -104,50 +104,58 @@ class _BudgetScreenState extends State<BudgetScreen> {
                   Text('Current Status', style: theme.textTheme.titleLarge),
                   const SizedBox(height: 16),
                   
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('Used'),
-                              Text(
-                                CurrencyFormatter.format(provider.currentUsage),
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  color: theme.colorScheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                  NeumorphicCard(
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Used'),
+                            Text(
+                              CurrencyFormatter.format(provider.currentUsage),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.bold,
                               ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text('Remaining'),
-                              Text(
-                                CurrencyFormatter.format(provider.remainingAmount),
-                                style: theme.textTheme.titleMedium?.copyWith(
-                                  color: provider.isSafe ? Colors.green : (provider.isWarning ? Colors.orange : Colors.red),
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 24),
-                          LinearProgressIndicator(
-                            value: provider.usagePercentage,
-                            backgroundColor: theme.colorScheme.surfaceContainerHighest,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              provider.isSafe ? Colors.green : (provider.isWarning ? Colors.orange : Colors.red),
                             ),
-                            minHeight: 12,
-                            borderRadius: BorderRadius.circular(6),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Remaining'),
+                            Text(
+                              CurrencyFormatter.format(provider.remainingAmount),
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                color: provider.isSafe ? Colors.green : (provider.isWarning ? Colors.orange : Colors.red),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                        NeumorphicContainer(
+                          isInset: true,
+                          height: 12,
+                          borderRadius: 6,
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: LayoutBuilder(
+                              builder: (context, constraints) {
+                                return Container(
+                                  width: constraints.maxWidth * provider.usagePercentage.clamp(0.0, 1.0),
+                                  height: 12,
+                                  decoration: BoxDecoration(
+                                    color: provider.isSafe ? Colors.green : (provider.isWarning ? Colors.orange : Colors.red),
+                                    borderRadius: BorderRadius.circular(6),
+                                  ),
+                                );
+                              },
+                            ),
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

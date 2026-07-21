@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../providers/savings_provider.dart';
+import '../widgets/neumorphic/neumorphic_container.dart';
 import '../widgets/suggestion_card.dart';
 
 class SavingsScreen extends StatefulWidget {
-  const SavingsScreen({Key? key}) : super(key: key);
+  const SavingsScreen({super.key});
 
   @override
   State<SavingsScreen> createState() => _SavingsScreenState();
@@ -14,13 +16,21 @@ class _SavingsScreenState extends State<SavingsScreen> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
       context.read<SavingsProvider>().loadSuggestions();
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark =
+        Theme.of(context).brightness == Brightness.dark;
+
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Savings Assistant'),
@@ -28,7 +38,9 @@ class _SavingsScreenState extends State<SavingsScreen> {
       body: Consumer<SavingsProvider>(
         builder: (context, provider, child) {
           if (provider.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
           }
 
           if (provider.suggestions.isEmpty) {
@@ -36,16 +48,30 @@ class _SavingsScreenState extends State<SavingsScreen> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.check_circle_outline, size: 80, color: Colors.green.withOpacity(0.5)),
+                  Icon(
+                    Icons.check_circle_outline,
+                    size: 80,
+                    color: Colors.green.withValues(alpha: 0.5),
+                  ),
                   const SizedBox(height: 16),
                   const Text(
                     'Your spending looks great!',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'No new savings suggestions at the moment.',
-                    style: TextStyle(color: Colors.grey),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 24),
+                    child: Text(
+                      'No new savings suggestions at the moment.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: Colors.grey,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -55,27 +81,25 @@ class _SavingsScreenState extends State<SavingsScreen> {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
-              Container(
+              NeumorphicContainer(
+                isInset: true,
                 padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Colors.green, Colors.teal],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
                 child: Column(
                   children: [
-                    const Text(
+                    Text(
                       'Potential Monthly Savings',
-                      style: TextStyle(color: Colors.white70, fontSize: 16),
+                      style: TextStyle(
+                        color: isDark
+                            ? Colors.white70
+                            : Colors.black54,
+                        fontSize: 16,
+                      ),
                     ),
                     const SizedBox(height: 8),
                     Text(
                       '₹${provider.totalPotentialSavings.toStringAsFixed(0)}',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: colorScheme.primary,
                         fontSize: 36,
                         fontWeight: FontWeight.bold,
                       ),
@@ -86,13 +110,20 @@ class _SavingsScreenState extends State<SavingsScreen> {
               const SizedBox(height: 24),
               const Text(
                 'Actionable Suggestions',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 16),
-              ...provider.suggestions.map((suggestion) => SuggestionCard(
-                suggestion: suggestion,
-                onDismiss: () => provider.markAsRevisited(suggestion.id),
-              )),
+              ...provider.suggestions.map(
+                    (suggestion) => SuggestionCard(
+                  suggestion: suggestion,
+                  onDismiss: () {
+                    provider.markAsRevisited(suggestion.id);
+                  },
+                ),
+              ),
             ],
           );
         },
