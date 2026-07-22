@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
+import 'app_spacing.dart';
 
 class AppTheme {
   AppTheme._();
@@ -44,7 +45,7 @@ class AppTheme {
       fontFamily: 'Inter',
       textTheme: _buildTextTheme(isDark),
 
-      // AppBar
+      // AppBar — flat, bold, neobrutalist
       appBarTheme: AppBarTheme(
         centerTitle: false,
         elevation: 0,
@@ -53,40 +54,97 @@ class AppTheme {
         foregroundColor: AppColors.getTextPrimary(isDark),
         titleTextStyle: TextStyle(
           fontFamily: 'Inter',
-          fontSize: 22,
-          fontWeight: FontWeight.w600,
+          fontSize: 24,
+          fontWeight: FontWeight.w800,
           color: AppColors.getTextPrimary(isDark),
         ),
       ),
 
-      // Dialog
+      // Dialog — neobrutalist with thick border
       dialogTheme: DialogThemeData(
         backgroundColor: scaffoldBg,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          side: BorderSide(
+            color: AppColors.getBorder(isDark),
+            width: AppSpacing.borderWidth,
+          ),
         ),
         elevation: 0,
       ),
 
-      // Bottom Sheet
+      // Bottom Sheet — neobrutalist
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: scaffoldBg,
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        shape: RoundedRectangleBorder(
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+          side: BorderSide(
+            color: AppColors.getBorder(isDark),
+            width: AppSpacing.borderWidth,
+          ),
         ),
         showDragHandle: true,
       ),
-      
-      // Floating Action Button Theme (fallback)
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
+
+      // Floating Action Button Theme
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
-      
+
       // Divider
       dividerTheme: DividerThemeData(
-        thickness: 1,
+        thickness: 2,
         color: AppColors.getDivider(isDark),
+      ),
+
+      // Input decoration — neobrutalist
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: AppColors.getSurface(isDark),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+          borderSide: BorderSide(
+            color: AppColors.getBorder(isDark),
+            width: AppSpacing.borderWidth,
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+          borderSide: BorderSide(
+            color: AppColors.getBorder(isDark),
+            width: AppSpacing.borderWidth,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+          borderSide: BorderSide(
+            color: AppColors.primary,
+            width: AppSpacing.borderWidthThick,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+          borderSide: BorderSide(
+            color: AppColors.error,
+            width: AppSpacing.borderWidth,
+          ),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.md,
+        ),
+      ),
+
+      // Chip theme
+      chipTheme: ChipThemeData(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+          side: BorderSide(
+            color: AppColors.getBorder(isDark),
+            width: AppSpacing.borderWidth,
+          ),
+        ),
       ),
     );
   }
@@ -95,19 +153,71 @@ class AppTheme {
     final color = AppColors.getTextPrimary(isDark);
 
     return TextTheme(
-      displayLarge: TextStyle(fontFamily: 'Inter', fontSize: 32, fontWeight: FontWeight.w700, color: color),
-      displayMedium: TextStyle(fontFamily: 'Inter', fontSize: 28, fontWeight: FontWeight.w700, color: color),
-      headlineLarge: TextStyle(fontFamily: 'Inter', fontSize: 24, fontWeight: FontWeight.w600, color: color),
-      headlineMedium: TextStyle(fontFamily: 'Inter', fontSize: 20, fontWeight: FontWeight.w600, color: color),
-      titleLarge: TextStyle(fontFamily: 'Inter', fontSize: 18, fontWeight: FontWeight.w600, color: color),
-      titleMedium: TextStyle(fontFamily: 'Inter', fontSize: 16, fontWeight: FontWeight.w500, color: color),
-      titleSmall: TextStyle(fontFamily: 'Inter', fontSize: 14, fontWeight: FontWeight.w500, color: color),
-      bodyLarge: TextStyle(fontFamily: 'Inter', fontSize: 16, fontWeight: FontWeight.w400, color: color),
-      bodyMedium: TextStyle(fontFamily: 'Inter', fontSize: 14, fontWeight: FontWeight.w400, color: color),
-      bodySmall: TextStyle(fontFamily: 'Inter', fontSize: 12, fontWeight: FontWeight.w400, color: AppColors.getTextSecondary(isDark)),
-      labelLarge: TextStyle(fontFamily: 'Inter', fontSize: 14, fontWeight: FontWeight.w600, color: color),
-      labelMedium: TextStyle(fontFamily: 'Inter', fontSize: 12, fontWeight: FontWeight.w500, color: color),
-      labelSmall: TextStyle(fontFamily: 'Inter', fontSize: 10, fontWeight: FontWeight.w500, color: AppColors.getTextSecondary(isDark)),
+      displayLarge: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 32,
+          fontWeight: FontWeight.w900,
+          color: color),
+      displayMedium: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 28,
+          fontWeight: FontWeight.w800,
+          color: color),
+      headlineLarge: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 24,
+          fontWeight: FontWeight.w700,
+          color: color),
+      headlineMedium: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 20,
+          fontWeight: FontWeight.w700,
+          color: color),
+      titleLarge: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 18,
+          fontWeight: FontWeight.w700,
+          color: color),
+      titleMedium: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+          color: color),
+      titleSmall: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: color),
+      bodyLarge: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 16,
+          fontWeight: FontWeight.w500,
+          color: color),
+      bodyMedium: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: color),
+      bodySmall: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: AppColors.getTextSecondary(isDark)),
+      labelLarge: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
+          color: color),
+      labelMedium: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: color),
+      labelSmall: TextStyle(
+          fontFamily: 'Inter',
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: AppColors.getTextSecondary(isDark)),
     );
   }
 }

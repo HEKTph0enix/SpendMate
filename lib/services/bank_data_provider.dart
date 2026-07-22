@@ -2,7 +2,6 @@
 // Designed as a plug-in point for future Account Aggregator or banking API integrations.
 // The ManualBankDataProvider allows users to manually enter balances as a fallback.
 
-import '../models/financial_account.dart';
 import '../models/transaction.dart' as app;
 
 /// Abstract interface for bank data synchronization.

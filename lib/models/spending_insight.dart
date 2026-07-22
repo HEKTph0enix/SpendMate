@@ -23,11 +23,9 @@ class SpendingInsight {
     DateTime? generatedAt,
   }) : generatedAt = generatedAt ?? DateTime.now();
 
-  bool get isPositiveChange =>
-      changePercent != null && changePercent! > 0;
+  bool get isPositiveChange => changePercent != null && changePercent! > 0;
 
-  bool get isNegativeChange =>
-      changePercent != null && changePercent! < 0;
+  bool get isNegativeChange => changePercent != null && changePercent! < 0;
 
   Map<String, dynamic> toMap() {
     return {

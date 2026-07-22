@@ -22,7 +22,8 @@ class DateFormatter {
 
   static String formatMonthYear(DateTime date) => _monthYear.format(date);
 
-  static String formatShortMonthYear(DateTime date) => _shortMonthYear.format(date);
+  static String formatShortMonthYear(DateTime date) =>
+      _shortMonthYear.format(date);
 
   /// Returns relative date string: "Today", "Yesterday", or formatted date.
   static String formatRelative(DateTime date) {

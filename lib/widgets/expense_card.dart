@@ -7,7 +7,8 @@ import 'category_icon.dart';
 class ExpenseCard extends StatelessWidget {
   final Expense expense;
   final VoidCallback? onTap;
-  final double? customShareAmount; // Used when showing user's share of a group expense
+  final double?
+      customShareAmount; // Used when showing user's share of a group expense
 
   const ExpenseCard({
     super.key,
@@ -22,7 +23,7 @@ class ExpenseCard extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
 
     final displayAmount = customShareAmount ?? expense.amount;
-    
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       child: InkWell(
@@ -58,7 +59,8 @@ class ExpenseCard extends StatelessWidget {
                           width: 4,
                           height: 4,
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5),
+                            color: theme.colorScheme.onSurfaceVariant
+                                .withOpacity(0.5),
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -70,7 +72,8 @@ class ExpenseCard extends StatelessWidget {
                         if (expense.isGroupExpense) ...[
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               color: theme.colorScheme.primaryContainer,
                               borderRadius: BorderRadius.circular(4),
@@ -100,7 +103,8 @@ class ExpenseCard extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  if (customShareAmount != null && customShareAmount != expense.amount) ...[
+                  if (customShareAmount != null &&
+                      customShareAmount != expense.amount) ...[
                     const SizedBox(height: 2),
                     Text(
                       'Total: ${CurrencyFormatter.format(expense.amount)}',

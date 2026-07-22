@@ -4,29 +4,30 @@ import 'app_colors.dart';
 class AppShadows {
   AppShadows._();
 
-  static List<BoxShadow> getNeumorphicShadow(bool isDark, {bool isInset = false, double elevation = 1.0}) {
-    if (isInset) {
-      // Inset shadow effect is usually simulated with inner shadows, 
-      // but Flutter's BoxShadow doesn't natively support inset.
-      // We will handle inset via inner container trick or just return empty for normal shadows and handle it in the widget.
-      // However, we can use a trick with gradient or borders in the widget.
-      // For BoxShadows, we just return the standard raised shadows here.
-      return [];
-    }
-    
+  /// Standard hard shadow for neobrutalist elements.
+  static List<BoxShadow> hard(bool isDark, {double offsetScale = 1.0}) {
     return [
       BoxShadow(
-        color: AppColors.getShadowDark(isDark),
-        offset: Offset(4 * elevation, 4 * elevation),
-        blurRadius: 10 * elevation,
-        spreadRadius: 1 * elevation,
-      ),
-      BoxShadow(
-        color: AppColors.getShadowLight(isDark),
-        offset: Offset(-4 * elevation, -4 * elevation),
-        blurRadius: 10 * elevation,
-        spreadRadius: 1 * elevation,
+        color: AppColors.getBorder(isDark),
+        offset: Offset(4 * offsetScale, 4 * offsetScale),
+        blurRadius: 0,
+        spreadRadius: 0,
       ),
     ];
   }
+
+  /// Pressed-state shadow (reduced offset).
+  static List<BoxShadow> pressed(bool isDark) {
+    return [
+      BoxShadow(
+        color: AppColors.getBorder(isDark),
+        offset: const Offset(1, 1),
+        blurRadius: 0,
+        spreadRadius: 0,
+      ),
+    ];
+  }
+
+  /// No shadow (for inset / flat states).
+  static List<BoxShadow> none() => [];
 }

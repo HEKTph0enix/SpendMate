@@ -57,7 +57,8 @@ class UserRepository {
   }
 
   Future<List<User>> getAllUsers() async {
-    final results = await _db.query(_table, orderBy: 'is_current_user DESC, name ASC');
+    final results =
+        await _db.query(_table, orderBy: 'is_current_user DESC, name ASC');
     return results.map((m) => User.fromMap(m)).toList();
   }
 

@@ -29,9 +29,12 @@ class AnalyticsService {
     final totalExpense = await _transactionRepo.getExpenseTotal(start, end);
     final totalIncome = await _transactionRepo.getIncomeTotal(start, end);
     final categoryTotals = await _transactionRepo.getCategoryTotals(start, end);
-    final paymentMethodTotals = await _transactionRepo.getPaymentMethodTotals(start, end);
-    final transactionCount = await _transactionRepo.getTransactionCount(start, end);
-    final highestExpense = await _transactionRepo.getHighestTransaction(start, end);
+    final paymentMethodTotals =
+        await _transactionRepo.getPaymentMethodTotals(start, end);
+    final transactionCount =
+        await _transactionRepo.getTransactionCount(start, end);
+    final highestExpense =
+        await _transactionRepo.getHighestTransaction(start, end);
     final dailyTotals = await _transactionRepo.getDailyTotals(start, end);
 
     // Average daily expense
@@ -74,7 +77,9 @@ class AnalyticsService {
 
     // Overall spending trend
     if (previous.totalExpense > 0) {
-      final change = ((current.totalExpense - previous.totalExpense) / previous.totalExpense) * 100;
+      final change = ((current.totalExpense - previous.totalExpense) /
+              previous.totalExpense) *
+          100;
       insights.add(SpendingInsight(
         id: _uuid.v4(),
         type: InsightType.trend,
@@ -99,7 +104,8 @@ class AnalyticsService {
             id: _uuid.v4(),
             type: InsightType.comparison,
             title: '${entry.key} spending increased',
-            description: '${entry.key} spending rose by ${change.toStringAsFixed(0)}% '
+            description:
+                '${entry.key} spending rose by ${change.toStringAsFixed(0)}% '
                 'from ₹${prevAmount.toStringAsFixed(0)} to ₹${entry.value.toStringAsFixed(0)}.',
             value: entry.value,
             previousValue: prevAmount,
@@ -137,9 +143,11 @@ class AnalyticsService {
       final txList = entry.value;
       if (txList.length >= AppConstants.recurringMinOccurrences) {
         // Check if amounts are within tolerance
-        final avgAmount = txList.fold(0.0, (sum, tx) => sum + tx.amount) / txList.length;
+        final avgAmount =
+            txList.fold(0.0, (sum, tx) => sum + tx.amount) / txList.length;
         final withinTolerance = txList.every((tx) =>
-            (tx.amount - avgAmount).abs() / avgAmount <= AppConstants.recurringAmountTolerance);
+            (tx.amount - avgAmount).abs() / avgAmount <=
+            AppConstants.recurringAmountTolerance);
 
         if (withinTolerance || txList.length >= 3) {
           final sorted = List<app.Transaction>.from(txList)
@@ -193,7 +201,8 @@ class AnalyticsService {
     final start = DateFormatter.startOfMonth(month);
     final end = DateFormatter.endOfMonth(month);
 
-    final transactions = await _transactionRepo.getByDateRange(start, end, type: 'expense');
+    final transactions =
+        await _transactionRepo.getByDateRange(start, end, type: 'expense');
     final categoryTotals = await _transactionRepo.getCategoryTotals(start, end);
 
     // Calculate category averages
@@ -216,7 +225,8 @@ class AnalyticsService {
           id: _uuid.v4(),
           type: InsightType.highValue,
           title: 'High ${tx.category} expense',
-          description: '₹${tx.amount.toStringAsFixed(0)} is ${(tx.amount / avg).toStringAsFixed(1)}× '
+          description:
+              '₹${tx.amount.toStringAsFixed(0)} is ${(tx.amount / avg).toStringAsFixed(1)}× '
               'the average ${tx.category} expense of ₹${avg.toStringAsFixed(0)}.',
           value: tx.amount,
           previousValue: avg,

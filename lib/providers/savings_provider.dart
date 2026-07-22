@@ -23,7 +23,8 @@ class SavingsProvider extends ChangeNotifier {
 
     try {
       _suggestions = await _savingsService.generateSuggestions();
-      _totalPotentialSavings = _savingsService.totalPotentialSavings(_suggestions);
+      _totalPotentialSavings =
+          _savingsService.totalPotentialSavings(_suggestions);
     } catch (e) {
       debugPrint('Error loading savings suggestions: $e');
     } finally {
@@ -33,11 +34,12 @@ class SavingsProvider extends ChangeNotifier {
   }
 
   void markAsRevisited(String suggestionId) {
-    // Note: Since suggestions are generated dynamically based on rules, 
+    // Note: Since suggestions are generated dynamically based on rules,
     // a "dismiss" action would ideally require persisting the dismissed state.
     // For this implementation, we just remove it from the list temporarily.
     _suggestions.removeWhere((s) => s.id == suggestionId);
-    _totalPotentialSavings = _savingsService.totalPotentialSavings(_suggestions);
+    _totalPotentialSavings =
+        _savingsService.totalPotentialSavings(_suggestions);
     notifyListeners();
   }
 }

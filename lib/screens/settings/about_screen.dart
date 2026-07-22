@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_constants.dart';
-import '../../widgets/neumorphic/neumorphic_container.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_spacing.dart';
 
 class AboutScreen extends StatelessWidget {
   const AboutScreen({super.key});
@@ -19,13 +20,29 @@ class AboutScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             const SizedBox(height: 32),
-            NeumorphicContainer(
+            Container(
               padding: const EdgeInsets.all(24),
-              shape: BoxShape.circle,
+              decoration: BoxDecoration(
+                color: AppColors.getCardAccentColors(Theme.of(context).brightness == Brightness.dark)[0],
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color:
+                      AppColors.getBorder(theme.brightness == Brightness.dark),
+                  width: AppSpacing.borderWidth,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.getBorder(
+                        theme.brightness == Brightness.dark),
+                    offset: const Offset(4, 4),
+                    blurRadius: 0,
+                  ),
+                ],
+              ),
               child: Icon(
                 Icons.account_balance_wallet,
                 size: 64,
-                color: theme.colorScheme.primary,
+                color: AppColors.accentPurple,
               ),
             ),
             const SizedBox(height: 24),

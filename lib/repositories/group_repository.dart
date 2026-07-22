@@ -55,7 +55,8 @@ class GroupRepository {
   }
 
   Future<List<ExpenseGroup>> getAllGroups() async {
-    final results = await _db.query('expense_groups', orderBy: 'updated_at DESC');
+    final results =
+        await _db.query('expense_groups', orderBy: 'updated_at DESC');
     return results.map((m) => ExpenseGroup.fromMap(m)).toList();
   }
 
@@ -120,7 +121,8 @@ class GroupRepository {
   }
 
   Future<void> deleteSplitsForExpense(String expenseId) async {
-    await _db.delete('group_splits', where: 'expense_id = ?', whereArgs: [expenseId]);
+    await _db.delete('group_splits',
+        where: 'expense_id = ?', whereArgs: [expenseId]);
   }
 
   // ─── Group Expenses with Splits (transactional) ────────────────────
@@ -146,7 +148,8 @@ class GroupRepository {
         where: 'id = ?',
         whereArgs: [expense.id],
       );
-      await txn.delete('group_splits', where: 'expense_id = ?', whereArgs: [expense.id]);
+      await txn.delete('group_splits',
+          where: 'expense_id = ?', whereArgs: [expense.id]);
       for (final split in splits) {
         await txn.insert('group_splits', split.toMap());
       }

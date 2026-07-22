@@ -25,7 +25,7 @@ class StatisticsProvider extends ChangeNotifier {
 
   DateTime get selectedMonth => _selectedMonth;
   bool get isLoading => _isLoading;
-  
+
   double get totalSpending => _totalSpending;
   int get transactionCount => _transactionCount;
   double get averageDaily => _averageDaily;
@@ -53,14 +53,16 @@ class StatisticsProvider extends ChangeNotifier {
     final userId = _settingsProvider.currentUserId;
 
     // Get personal spending total (including user's share of group expenses)
-    _totalSpending = await _expenseRepo.getPersonalSpendingTotal(start, end, userId);
+    _totalSpending =
+        await _expenseRepo.getPersonalSpendingTotal(start, end, userId);
 
-    // To calculate other stats accurately, we need the expenses. 
+    // To calculate other stats accurately, we need the expenses.
     // For simplicity in UI, we fetch personal expenses. For full accuracy, we'd fetch all and map shares.
-    final expenses = await _expenseRepo.getExpensesByDateRange(start, end, personalOnly: true);
+    final expenses = await _expenseRepo.getExpensesByDateRange(start, end,
+        personalOnly: true);
 
     _transactionCount = expenses.length;
-    
+
     // Group expenses count could be added here if needed
 
     int daysInMonth;
@@ -68,9 +70,10 @@ class StatisticsProvider extends ChangeNotifier {
     if (_selectedMonth.year == now.year && _selectedMonth.month == now.month) {
       daysInMonth = now.day; // Use days so far if current month
     } else {
-      daysInMonth = DateFormatter.daysInMonth(_selectedMonth.year, _selectedMonth.month);
+      daysInMonth =
+          DateFormatter.daysInMonth(_selectedMonth.year, _selectedMonth.month);
     }
-    
+
     _averageDaily = daysInMonth > 0 ? _totalSpending / daysInMonth : 0;
 
     _highestExpense = 0.0;
@@ -83,10 +86,11 @@ class StatisticsProvider extends ChangeNotifier {
       }
 
       // Category totals
-      _categoryTotals[expense.category] = (_categoryTotals[expense.category] ?? 0) + expense.amount;
+      _categoryTotals[expense.category] =
+          (_categoryTotals[expense.category] ?? 0) + expense.amount;
 
       // Payment method totals
-      _paymentMethodTotals[expense.paymentMethod] = 
+      _paymentMethodTotals[expense.paymentMethod] =
           (_paymentMethodTotals[expense.paymentMethod] ?? 0) + expense.amount;
     }
 

@@ -34,12 +34,14 @@ class AnalyticsProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _currentMonthStats = await _analyticsService.computeMonthlyStats(_selectedMonth);
+      _currentMonthStats =
+          await _analyticsService.computeMonthlyStats(_selectedMonth);
       _insights = await _analyticsService.generateInsights(_selectedMonth);
       _anomalies = await _analyticsService.detectAnomalies(_selectedMonth);
-      
+
       // Load recurring expenses only for the current month
-      if (_selectedMonth.year == DateTime.now().year && _selectedMonth.month == DateTime.now().month) {
+      if (_selectedMonth.year == DateTime.now().year &&
+          _selectedMonth.month == DateTime.now().month) {
         _recurringExpenses = await _analyticsService.detectRecurringExpenses();
       }
     } catch (e) {

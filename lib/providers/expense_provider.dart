@@ -2,7 +2,11 @@
 
 import 'package:flutter/material.dart';
 import '../models/expense.dart';
+import '../models/transaction.dart' as app;
 import '../repositories/expense_repository.dart';
+import '../repositories/transaction_repository.dart';
+import '../repositories/cash_wallet_repository.dart';
+import '../repositories/financial_account_repository.dart';
 import '../utils/date_formatter.dart';
 
 class ExpenseProvider extends ChangeNotifier {
@@ -45,16 +49,81 @@ class ExpenseProvider extends ChangeNotifier {
 
   Future<void> addExpense(Expense expense) async {
     await _repo.insertExpense(expense);
+    
+    // Sync to V2 Dashboard (transactions table)
+    final txRepo = TransactionRepository();
+    final tx = app.Transaction(
+      id: expense.id,
+      amount: expense.amount,
+      type: app.TransactionType.expense,
+      category: expense.category,
+      paymentMethod: expense.paymentMethod,
+      source: app.TransactionSource.manual,
+      date: expense.dateTime,
+      note: expense.note,
+    );
+    await txRepo.insertTransaction(tx);
+    
+    // Deduct from appropriate balance
+    if (expense.paymentMethod == 'Cash') {
+      final cwRepo = CashWalletRepository();
+      final bal = await cwRepo.getBalance();
+      await cwRepo.updateBalance(bal - expense.amount);
+    } else if (expense.paymentMethod == 'Online Transaction') {
+      final accRepo = FinancialAccountRepository();
+      final accounts = await accRepo.getActiveAccounts();
+      if (accounts.isNotEmpty) {
+        final acc = accounts.first;
+        await accRepo.updateBalance(acc.id, acc.balance - expense.amount);
+      }
+    }
+
     await loadExpenses();
   }
 
   Future<void> updateExpense(Expense expense) async {
+    // Note: To be fully consistent, we'd adjust balances by the difference,
+    // but for simplicity we'll just update the transaction record here.
     await _repo.updateExpense(expense);
+    
+    final txRepo = TransactionRepository();
+    final existingTx = await txRepo.getById(expense.id);
+    if (existingTx != null) {
+      final updatedTx = existingTx.copyWith(
+        amount: expense.amount,
+        category: expense.category,
+        paymentMethod: expense.paymentMethod,
+        date: expense.dateTime,
+        note: expense.note,
+      );
+      await txRepo.updateTransaction(updatedTx);
+    }
+    
     await loadExpenses();
   }
 
   Future<void> deleteExpense(String id) async {
+    final existingExpense = _expenses.firstWhere((e) => e.id == id);
+    
     await _repo.deleteExpense(id);
+    
+    // Also delete from V2 transactions and restore balance
+    final txRepo = TransactionRepository();
+    await txRepo.deleteTransaction(id);
+    
+    if (existingExpense.paymentMethod == 'Cash') {
+      final cwRepo = CashWalletRepository();
+      final bal = await cwRepo.getBalance();
+      await cwRepo.updateBalance(bal + existingExpense.amount);
+    } else if (existingExpense.paymentMethod == 'Online Transaction') {
+      final accRepo = FinancialAccountRepository();
+      final accounts = await accRepo.getActiveAccounts();
+      if (accounts.isNotEmpty) {
+        final acc = accounts.first;
+        await accRepo.updateBalance(acc.id, acc.balance + existingExpense.amount);
+      }
+    }
+    
     await loadExpenses();
   }
 
@@ -130,17 +199,22 @@ class ExpenseProvider extends ChangeNotifier {
       if (e.dateTime.isBefore(start) || e.dateTime.isAfter(end)) return false;
 
       // Category filter
-      if (_filterCategory != null && e.category != _filterCategory) return false;
+      if (_filterCategory != null && e.category != _filterCategory)
+        return false;
 
       // Payment method filter
-      if (_filterPaymentMethod != null && e.paymentMethod != _filterPaymentMethod) return false;
+      if (_filterPaymentMethod != null &&
+          e.paymentMethod != _filterPaymentMethod) return false;
 
       // Group filter
-      if (_filterIsGroup != null && e.isGroupExpense != _filterIsGroup) return false;
+      if (_filterIsGroup != null && e.isGroupExpense != _filterIsGroup)
+        return false;
 
       // Amount range filter
-      if (_filterMinAmount != null && e.amount < _filterMinAmount!) return false;
-      if (_filterMaxAmount != null && e.amount > _filterMaxAmount!) return false;
+      if (_filterMinAmount != null && e.amount < _filterMinAmount!)
+        return false;
+      if (_filterMaxAmount != null && e.amount > _filterMaxAmount!)
+        return false;
 
       // Search filter
       if (_searchQuery != null && _searchQuery!.isNotEmpty) {

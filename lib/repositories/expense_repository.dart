@@ -36,12 +36,14 @@ class ExpenseRepository {
     return Expense.fromMap(results.first);
   }
 
-  Future<List<Expense>> getAllExpenses({String orderBy = 'date_time DESC'}) async {
+  Future<List<Expense>> getAllExpenses(
+      {String orderBy = 'date_time DESC'}) async {
     final results = await _db.query(_table, orderBy: orderBy);
     return results.map((m) => Expense.fromMap(m)).toList();
   }
 
-  Future<List<Expense>> getPersonalExpenses({String orderBy = 'date_time DESC'}) async {
+  Future<List<Expense>> getPersonalExpenses(
+      {String orderBy = 'date_time DESC'}) async {
     final results = await _db.query(
       _table,
       where: 'is_group_expense = ?',
@@ -184,7 +186,8 @@ class ExpenseRepository {
          AND date_time >= ? AND date_time <= ?''',
       [start.toIso8601String(), end.toIso8601String()],
     );
-    final personalTotal = (personalResult.first['total'] as num?)?.toDouble() ?? 0.0;
+    final personalTotal =
+        (personalResult.first['total'] as num?)?.toDouble() ?? 0.0;
 
     // Group expenses: user's share only
     final groupResult = await _db.rawQuery(
@@ -195,7 +198,8 @@ class ExpenseRepository {
          AND e.date_time >= ? AND e.date_time <= ?''',
       [currentUserId, start.toIso8601String(), end.toIso8601String()],
     );
-    final groupShareTotal = (groupResult.first['total'] as num?)?.toDouble() ?? 0.0;
+    final groupShareTotal =
+        (groupResult.first['total'] as num?)?.toDouble() ?? 0.0;
 
     return personalTotal + groupShareTotal;
   }

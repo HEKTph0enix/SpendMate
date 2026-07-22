@@ -14,7 +14,8 @@ class SettlementSuggestion {
   });
 
   @override
-  String toString() => 'SettlementSuggestion($fromUserId pays $toUserId: $amount)';
+  String toString() =>
+      'SettlementSuggestion($fromUserId pays $toUserId: $amount)';
 }
 
 class SettlementAlgorithm {
@@ -55,16 +56,15 @@ class SettlementAlgorithm {
       if (debtors.isEmpty || creditors.isEmpty) break;
 
       // Find largest debtor (most negative) and largest creditor (most positive)
-      String largestDebtor = debtors.entries
-          .reduce((a, b) => a.value < b.value ? a : b)
-          .key;
-      String largestCreditor = creditors.entries
-          .reduce((a, b) => a.value > b.value ? a : b)
-          .key;
+      String largestDebtor =
+          debtors.entries.reduce((a, b) => a.value < b.value ? a : b).key;
+      String largestCreditor =
+          creditors.entries.reduce((a, b) => a.value > b.value ? a : b).key;
 
       final debtAmount = remaining[largestDebtor]!.abs();
       final creditAmount = remaining[largestCreditor]!;
-      final transferAmount = debtAmount < creditAmount ? debtAmount : creditAmount;
+      final transferAmount =
+          debtAmount < creditAmount ? debtAmount : creditAmount;
 
       // Round to 2 decimal places
       final roundedAmount = double.parse(transferAmount.toStringAsFixed(2));
@@ -90,6 +90,7 @@ class SettlementAlgorithm {
 
   /// Check if all members in a group are settled.
   static bool isGroupSettled(Map<String, double> balances) {
-    return balances.values.every((v) => v.abs() < AppConstants.settlementTolerance);
+    return balances.values
+        .every((v) => v.abs() < AppConstants.settlementTolerance);
   }
 }

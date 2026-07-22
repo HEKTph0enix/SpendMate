@@ -71,7 +71,8 @@ class Settlement {
 
   Map<String, dynamic> toJson() => toMap();
 
-  factory Settlement.fromJson(Map<String, dynamic> json) => Settlement.fromMap(json);
+  factory Settlement.fromJson(Map<String, dynamic> json) =>
+      Settlement.fromMap(json);
 
   @override
   String toString() =>

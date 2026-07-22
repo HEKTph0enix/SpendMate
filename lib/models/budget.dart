@@ -63,5 +63,6 @@ class Budget {
   factory Budget.fromJson(Map<String, dynamic> json) => Budget.fromMap(json);
 
   @override
-  String toString() => 'Budget(id: $id, month: $month/$year, limit: $limitAmount)';
+  String toString() =>
+      'Budget(id: $id, month: $month/$year, limit: $limitAmount)';
 }

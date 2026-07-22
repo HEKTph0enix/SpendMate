@@ -38,7 +38,8 @@ class GroupProvider extends ChangeNotifier {
   List<Expense> get activeGroupExpenses => _activeGroupExpenses;
   List<Settlement> get activeGroupSettlements => _activeGroupSettlements;
   Map<String, double> get activeGroupBalances => _activeGroupBalances;
-  List<SettlementSuggestion> get settlementSuggestions => _settlementSuggestions;
+  List<SettlementSuggestion> get settlementSuggestions =>
+      _settlementSuggestions;
 
   Future<void> loadGroups() async {
     _isLoading = true;
@@ -66,7 +67,8 @@ class GroupProvider extends ChangeNotifier {
       }
 
       await _groupRepo.addMember(GroupMember(
-        id: DateTime.now().millisecondsSinceEpoch.toString() + user.id, // Basic ID
+        id: DateTime.now().millisecondsSinceEpoch.toString() +
+            user.id, // Basic ID
         groupId: group.id,
         userId: user.id,
       ));
@@ -77,13 +79,13 @@ class GroupProvider extends ChangeNotifier {
 
   Future<void> updateGroup(ExpenseGroup group, List<User> members) async {
     await _groupRepo.updateGroup(group);
-    
+
     // Update members (simple approach: remove all, re-add)
     final existingMembers = await _groupRepo.getGroupMembers(group.id);
     for (final member in existingMembers) {
       await _groupRepo.removeMember(member.id);
     }
-    
+
     for (final user in members) {
       // Ensure user exists
       final existingUser = await _userRepo.getUserById(user.id);
@@ -97,7 +99,7 @@ class GroupProvider extends ChangeNotifier {
         userId: user.id,
       ));
     }
-    
+
     await loadGroups();
     if (_activeGroup?.id == group.id) {
       await loadActiveGroupDetails(group.id);
@@ -121,7 +123,7 @@ class GroupProvider extends ChangeNotifier {
     _activeGroup = await _groupRepo.getGroupById(groupId);
     if (_activeGroup != null) {
       _activeGroupMembers = await _groupRepo.getGroupMembers(groupId);
-      
+
       // Load user details for members
       _activeGroupUsers = [];
       for (final member in _activeGroupMembers) {
@@ -132,10 +134,12 @@ class GroupProvider extends ChangeNotifier {
       }
 
       _activeGroupExpenses = await _groupRepo.getGroupExpenses(groupId);
-      _activeGroupSettlements = await _settlementRepo.getGroupSettlements(groupId);
-      
+      _activeGroupSettlements =
+          await _settlementRepo.getGroupSettlements(groupId);
+
       _activeGroupBalances = await _groupRepo.calculateGroupBalances(groupId);
-      _settlementSuggestions = SettlementAlgorithm.calculateMinimumSettlements(_activeGroupBalances);
+      _settlementSuggestions =
+          SettlementAlgorithm.calculateMinimumSettlements(_activeGroupBalances);
     }
 
     _isLoading = false;
@@ -150,8 +154,9 @@ class GroupProvider extends ChangeNotifier {
       await loadActiveGroupDetails(expense.groupId!);
     }
   }
-  
-  Future<void> updateGroupExpense(Expense expense, List<GroupSplit> splits) async {
+
+  Future<void> updateGroupExpense(
+      Expense expense, List<GroupSplit> splits) async {
     await _groupRepo.updateGroupExpenseWithSplits(expense, splits);
     if (_activeGroup?.id == expense.groupId) {
       await loadActiveGroupDetails(expense.groupId!);
@@ -162,10 +167,11 @@ class GroupProvider extends ChangeNotifier {
     // Delete handled by expense repo normally, but splits need cascade or manual deletion
     final DatabaseHelper db = DatabaseHelper();
     await db.runTransaction((txn) async {
-      await txn.delete('group_splits', where: 'expense_id = ?', whereArgs: [id]);
+      await txn
+          .delete('group_splits', where: 'expense_id = ?', whereArgs: [id]);
       await txn.delete('expenses', where: 'id = ?', whereArgs: [id]);
     });
-    
+
     if (_activeGroup?.id == groupId) {
       await loadActiveGroupDetails(groupId);
     }

@@ -59,7 +59,8 @@ class GroupSplit {
 
   Map<String, dynamic> toJson() => toMap();
 
-  factory GroupSplit.fromJson(Map<String, dynamic> json) => GroupSplit.fromMap(json);
+  factory GroupSplit.fromJson(Map<String, dynamic> json) =>
+      GroupSplit.fromMap(json);
 
   @override
   String toString() =>

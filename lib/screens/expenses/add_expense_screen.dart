@@ -5,13 +5,18 @@ import 'package:uuid/uuid.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/budget_provider.dart';
 import '../../providers/statistics_provider.dart';
+import '../../providers/financial_dashboard_provider.dart';
+import '../../providers/cash_wallet_provider.dart';
+import '../../providers/analytics_provider.dart';
 import '../../models/expense.dart';
 import '../../constants/app_constants.dart';
 import '../../constants/categories.dart';
 import '../../utils/date_formatter.dart';
-import '../../widgets/neumorphic/neumorphic_text_field.dart';
-import '../../widgets/neumorphic/neumorphic_dropdown.dart';
-import '../../widgets/neumorphic/neumorphic_button.dart';
+import '../../widgets/neobrutal/neobrutal_text_field.dart';
+import '../../widgets/neobrutal/neobrutal_dropdown.dart';
+import '../../widgets/neobrutal/neobrutal_button.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_text_styles.dart';
 import 'upi_payment_screen.dart';
 
 class AddExpenseScreen extends StatefulWidget {
@@ -27,12 +32,12 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _noteController = TextEditingController();
-  
+
   String _selectedCategory = AppConstants.categories.first;
   String _selectedPaymentMethod = AppConstants.paymentMethods.first;
   DateTime _selectedDate = DateTime.now();
   TimeOfDay _selectedTime = TimeOfDay.now();
-  
+
   bool _isLoading = false;
   final _uuid = const Uuid();
 
@@ -91,7 +96,8 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
     if (amount == null || amount <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid amount greater than zero')),
+        const SnackBar(
+            content: Text('Please enter a valid amount greater than zero')),
       );
       return;
     }
@@ -115,7 +121,9 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         dateTime: dateTime,
         category: _selectedCategory,
         paymentMethod: _selectedPaymentMethod,
-        note: _noteController.text.trim().isEmpty ? null : _noteController.text.trim(),
+        note: _noteController.text.trim().isEmpty
+            ? null
+            : _noteController.text.trim(),
         source: widget.expenseToEdit?.source ?? 'manual',
         createdAt: widget.expenseToEdit?.createdAt,
       );
@@ -133,6 +141,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       // Refresh budget and statistics after saving
       context.read<BudgetProvider>().loadCurrentBudget();
       context.read<StatisticsProvider>().loadStatistics();
+      
+      // NEW: Refresh V2 providers
+      context.read<FinancialDashboardProvider>().refreshDashboard();
+      context.read<CashWalletProvider>().refreshWallet();
+      context.read<AnalyticsProvider>().loadAnalytics();
 
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(
@@ -186,7 +199,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final isEditing = widget.expenseToEdit != null;
 
     return Scaffold(
@@ -205,7 +218,13 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           else
             TextButton(
               onPressed: _isLoading ? null : _saveExpense,
-              child: const Text('SAVE'),
+              child: Text(
+                'SAVE',
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                ),
+              ),
             ),
         ],
       ),
@@ -216,40 +235,44 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           children: [
             // Pay via UPI button (only for new expenses, not when editing)
             if (!isEditing) ...[
-              NeumorphicButton(
+              NeoBrutalButton(
                 onPressed: _navigateToUpiPayment,
-                child: Row(
+                backgroundColor: AppColors.accentTeal,
+                child: const Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     Icon(Icons.account_balance),
                     SizedBox(width: 8),
                     Text('Pay Using UPI'),
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 12),
               Row(
                 children: [
-                  const Expanded(child: Divider()),
+                  Expanded(
+                      child: Container(
+                          height: 2, color: AppColors.getBorder(isDark))),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: Text(
                       'OR ENTER MANUALLY',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                      ),
+                      style: AppTextStyles.bodySmall(isDark),
                     ),
                   ),
-                  const Expanded(child: Divider()),
+                  Expanded(
+                      child: Container(
+                          height: 2, color: AppColors.getBorder(isDark))),
                 ],
               ),
               const SizedBox(height: 16),
             ],
 
             // Amount
-            NeumorphicTextField(
+            NeoBrutalTextField(
               controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               labelText: 'Amount',
               prefixText: '₹ ',
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -270,7 +293,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             const SizedBox(height: 24),
 
             // Note
-            NeumorphicTextField(
+            NeoBrutalTextField(
               controller: _noteController,
               labelText: 'Note (Optional)',
               prefixIcon: const Icon(Icons.notes),
@@ -313,7 +336,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             const SizedBox(height: 24),
 
             // Payment Method
-            NeumorphicDropdown<String>(
+            NeoBrutalDropdown<String>(
               value: _selectedPaymentMethod,
               labelText: 'Payment Method',
               prefixIcon: const Icon(Icons.account_balance_wallet),
@@ -334,7 +357,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
             // Category
             Text(
               'Category',
-              style: theme.textTheme.titleMedium,
+              style: AppTextStyles.cardTitle(isDark),
             ),
             const SizedBox(height: 12),
             Wrap(
@@ -353,15 +376,21 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                   avatar: Icon(
                     CategoryHelper.getIcon(category),
                     size: 18,
-                    color: isSelected ? theme.colorScheme.onPrimary : CategoryHelper.getColor(category),
+                    color: isSelected
+                        ? Colors.white
+                        : CategoryHelper.getColor(category),
                   ),
-                  selectedColor: theme.colorScheme.primary,
+                  selectedColor: AppColors.primary,
                   labelStyle: TextStyle(
-                    color: isSelected ? theme.colorScheme.onPrimary : theme.colorScheme.onSurface,
+                    color: isSelected
+                        ? Colors.white
+                        : AppColors.getTextPrimary(isDark),
+                    fontWeight: FontWeight.w600,
                   ),
                 );
               }).toList(),
             ),
+            const SizedBox(height: 80),
           ],
         ),
       ),

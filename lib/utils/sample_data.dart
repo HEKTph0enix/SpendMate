@@ -145,14 +145,16 @@ class SampleData {
       payerUserId: currentUser.id,
     );
 
-    final hotelSplits = members.map((m) => GroupSplit(
-      id: _uuid.v4(),
-      expenseId: hotelExpenseId,
-      userId: m.id,
-      shareAmount: 1200,
-      sharePercentage: 25,
-      splitType: AppConstants.splitEqual,
-    )).toList();
+    final hotelSplits = members
+        .map((m) => GroupSplit(
+              id: _uuid.v4(),
+              expenseId: hotelExpenseId,
+              userId: m.id,
+              shareAmount: 1200,
+              sharePercentage: 25,
+              splitType: AppConstants.splitEqual,
+            ))
+        .toList();
 
     await groupRepo.addGroupExpenseWithSplits(hotelExpense, hotelSplits);
 
@@ -170,14 +172,16 @@ class SampleData {
       payerUserId: arun.id,
     );
 
-    final dinnerSplits = members.map((m) => GroupSplit(
-      id: _uuid.v4(),
-      expenseId: dinnerExpenseId,
-      userId: m.id,
-      shareAmount: 800,
-      sharePercentage: 25,
-      splitType: AppConstants.splitEqual,
-    )).toList();
+    final dinnerSplits = members
+        .map((m) => GroupSplit(
+              id: _uuid.v4(),
+              expenseId: dinnerExpenseId,
+              userId: m.id,
+              shareAmount: 800,
+              sharePercentage: 25,
+              splitType: AppConstants.splitEqual,
+            ))
+        .toList();
 
     await groupRepo.addGroupExpenseWithSplits(dinnerExpense, dinnerSplits);
 

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import '../models/expense_group.dart';
+import '../core/theme/app_colors.dart';
+import '../core/theme/app_text_styles.dart';
+import '../core/theme/app_spacing.dart';
 import '../utils/currency_formatter.dart';
 import '../utils/date_formatter.dart';
-import 'neumorphic/neumorphic_card.dart';
-import 'neumorphic/neumorphic_container.dart';
+import 'neobrutal/neobrutal_card.dart';
 
 class GroupCard extends StatelessWidget {
   final ExpenseGroup group;
   final int memberCount;
   final double userBalance;
   final VoidCallback onTap;
+  final Color? cardColor;
 
   const GroupCard({
     super.key,
@@ -17,17 +20,14 @@ class GroupCard extends StatelessWidget {
     required this.memberCount,
     required this.userBalance,
     required this.onTap,
+    this.cardColor,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     // Balance logic
-    // Positive balance = owed money (creditor)
-    // Negative balance = owes money (debtor)
-    // Zero balance = settled up
-    
     final isSettled = userBalance.abs() < 0.01;
     final isOwed = userBalance > 0.01;
     final balanceAmount = userBalance.abs();
@@ -36,103 +36,105 @@ class GroupCard extends StatelessWidget {
     String balanceText;
 
     if (isSettled) {
-      balanceColor = theme.colorScheme.onSurfaceVariant;
+      balanceColor = AppColors.getTextSecondary(isDark);
       balanceText = 'Settled up';
     } else if (isOwed) {
-      balanceColor = Colors.green.shade600;
+      balanceColor = AppColors.accentGreen;
       balanceText = 'You are owed\n${CurrencyFormatter.format(balanceAmount)}';
     } else {
-      balanceColor = Colors.red.shade600;
+      balanceColor = AppColors.error;
       balanceText = 'You owe\n${CurrencyFormatter.format(balanceAmount)}';
     }
 
-    return NeumorphicCard(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    return NeoBrutalCard(
+      margin: const EdgeInsets.symmetric(vertical: 6),
+      backgroundColor: cardColor,
       onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      group.name,
+                      style: AppTextStyles.sectionHeading(isDark),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
                       children: [
+                        Icon(Icons.group,
+                            size: 14,
+                            color: AppColors.getTextSecondary(isDark)),
+                        const SizedBox(width: 4),
                         Text(
-                          group.name,
-                          style: theme.textTheme.titleLarge,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: 4),
-                        Row(
-                          children: [
-                            Icon(
-                              Icons.group,
-                              size: 14,
-                              color: theme.colorScheme.onSurfaceVariant,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              '$memberCount members',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: theme.colorScheme.onSurfaceVariant,
-                              ),
-                            ),
-                          ],
+                          '$memberCount members',
+                          style: AppTextStyles.bodySmall(isDark),
                         ),
                       ],
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  NeumorphicContainer(
-                    isInset: true,
-                    borderRadius: 8,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                    child: Text(
-                      balanceText,
-                      textAlign: TextAlign.right,
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        color: balanceColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              if (group.description != null && group.description!.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                Text(
-                  group.description!,
-                  style: theme.textTheme.bodyMedium,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
+                  ],
                 ),
-              ],
-              const SizedBox(height: 12),
-              const Divider(),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Last updated: ${DateFormatter.formatDateOnly(group.updatedAt)}',
-                    style: theme.textTheme.bodySmall,
+              ),
+              const SizedBox(width: 12),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppColors.getSurface(isDark),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                  border: Border.all(
+                    color: AppColors.getBorder(isDark),
+                    width: 1.5,
                   ),
-                  Icon(
-                    Icons.chevron_right,
-                    size: 20,
-                    color: theme.colorScheme.primary,
+                ),
+                child: Text(
+                  balanceText,
+                  textAlign: TextAlign.right,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: balanceColor,
                   ),
-                ],
+                ),
               ),
             ],
           ),
-        ),
-      );
+          if (group.description != null && group.description!.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            Text(
+              group.description!,
+              style: AppTextStyles.body(isDark),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+          const SizedBox(height: 12),
+          Container(height: 2, color: AppColors.getBorder(isDark)),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Last updated: ${DateFormatter.formatDateOnly(group.updatedAt)}',
+                style: AppTextStyles.bodySmall(isDark),
+              ),
+              Icon(
+                Icons.chevron_right,
+                size: 20,
+                color: AppColors.primary,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
   }
 }

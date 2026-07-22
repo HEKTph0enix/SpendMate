@@ -35,9 +35,8 @@ class CsvExporter {
     ]);
 
     for (final expense in expenses) {
-      final groupName = expense.groupId != null
-          ? (groups[expense.groupId]?.name ?? '')
-          : '';
+      final groupName =
+          expense.groupId != null ? (groups[expense.groupId]?.name ?? '') : '';
 
       final payerName = expense.payerUserId != null
           ? (users[expense.payerUserId]?.name ?? '')
@@ -46,7 +45,8 @@ class CsvExporter {
       double currentUserShare = expense.amount;
       if (expense.isGroupExpense && splitsByExpense.containsKey(expense.id)) {
         final splits = splitsByExpense[expense.id]!;
-        final userSplit = splits.where((s) => s.userId == currentUserId).toList();
+        final userSplit =
+            splits.where((s) => s.userId == currentUserId).toList();
         if (userSplit.isNotEmpty) {
           currentUserShare = userSplit.first.shareAmount;
         } else {

@@ -24,7 +24,8 @@ class CashWalletProvider extends ChangeNotifier {
     try {
       _balance = await _walletService.getBalance();
       _cashTransactions = await _walletService.getCashTransactions();
-      _cashTransactions.sort((a, b) => b.date.compareTo(a.date)); // Sort latest first
+      _cashTransactions
+          .sort((a, b) => b.date.compareTo(a.date)); // Sort latest first
     } catch (e) {
       debugPrint('Error refreshing cash wallet: $e');
     } finally {
@@ -33,13 +34,17 @@ class CashWalletProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> addCashReceived(double amount, {String? note, String category = 'Other Income'}) async {
-    await _walletService.addCashReceived(amount: amount, note: note, category: category);
+  Future<void> addCashReceived(double amount,
+      {String? note, String category = 'Other Income'}) async {
+    await _walletService.addCashReceived(
+        amount: amount, note: note, category: category);
     await refreshWallet();
   }
 
-  Future<void> recordCashExpense(double amount, String category, {String? note}) async {
-    await _walletService.recordCashExpense(amount: amount, category: category, note: note);
+  Future<void> recordCashExpense(double amount, String category,
+      {String? note}) async {
+    await _walletService.recordCashExpense(
+        amount: amount, category: category, note: note);
     await refreshWallet();
   }
 

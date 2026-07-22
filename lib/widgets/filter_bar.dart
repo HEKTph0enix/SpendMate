@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'neumorphic/neumorphic_container.dart';
+import '../core/theme/app_colors.dart';
+import '../core/theme/app_spacing.dart';
 
 class FilterBar extends StatelessWidget {
   final List<String> filters;
@@ -15,6 +16,8 @@ class FilterBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return SizedBox(
       height: 48,
       child: ListView.separated(
@@ -25,22 +28,44 @@ class FilterBar extends StatelessWidget {
         itemBuilder: (context, index) {
           final filter = filters[index];
           final isActive = filter == activeFilter;
-          
+
           return GestureDetector(
             onTap: () {
               if (!isActive) {
                 onFilterChanged(filter);
               }
             },
-            child: NeumorphicContainer(
-              isInset: isActive,
-              borderRadius: 20,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 150),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text(
-                filter,
-                style: TextStyle(
-                  color: isActive ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.onSurface,
-                  fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              decoration: BoxDecoration(
+                color:
+                    isActive ? AppColors.primary : AppColors.getSurface(isDark),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+                border: Border.all(
+                  color: AppColors.getBorder(isDark),
+                  width: AppSpacing.borderWidth,
+                ),
+                boxShadow: isActive
+                    ? [
+                        BoxShadow(
+                          color: AppColors.getBorder(isDark),
+                          offset: const Offset(2, 2),
+                          blurRadius: 0,
+                        ),
+                      ]
+                    : [],
+              ),
+              child: Center(
+                child: Text(
+                  filter,
+                  style: TextStyle(
+                    color: isActive
+                        ? Colors.white
+                        : AppColors.getTextPrimary(isDark),
+                    fontWeight: FontWeight.w700,
+                    fontSize: 13,
+                  ),
                 ),
               ),
             ),

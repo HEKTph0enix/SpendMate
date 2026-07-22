@@ -6,9 +6,8 @@ import 'package:provider/provider.dart';
 import '../services/statement_import_service.dart';
 import '../models/transaction.dart' as app;
 import '../providers/financial_dashboard_provider.dart';
-import '../widgets/neumorphic/neumorphic_card.dart';
-import '../widgets/neumorphic/neumorphic_button.dart';
-import '../widgets/neumorphic/neumorphic_container.dart';
+import '../widgets/neobrutal/neobrutal_card.dart';
+import '../widgets/neobrutal/neobrutal_button.dart';
 
 class StatementImportScreen extends StatefulWidget {
   const StatementImportScreen({Key? key}) : super(key: key);
@@ -37,7 +36,7 @@ class _StatementImportScreenState extends State<StatementImportScreen> {
       if (result != null && result.files.single.path != null) {
         final file = File(result.files.single.path!);
         final content = await file.readAsString(encoding: utf8);
-        
+
         setState(() {
           _result = _importService.importCsv(content);
         });
@@ -58,15 +57,17 @@ class _StatementImportScreenState extends State<StatementImportScreen> {
 
     // TODO: In a real app, you would let the user select the account here.
     // For now, we'll just save them and refresh the dashboard.
-    
+
     // The actual saving would happen via a provider or repository.
     // Assuming the user has to assign them to an account later or we assign to a default.
     // For this prototype, we'll just show a success message.
-    
+
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Saved ${_result!.parsedCount} transactions successfully!')),
+      SnackBar(
+          content:
+              Text('Saved ${_result!.parsedCount} transactions successfully!')),
     );
-    
+
     // Refresh dashboard to show new transactions
     context.read<FinancialDashboardProvider>().refreshDashboard();
     Navigator.pop(context);
@@ -83,7 +84,7 @@ class _StatementImportScreenState extends State<StatementImportScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const NeumorphicCard(
+            const NeoBrutalCard(
               child: Padding(
                 padding: EdgeInsets.all(16.0),
                 child: Column(
@@ -91,10 +92,12 @@ class _StatementImportScreenState extends State<StatementImportScreen> {
                   children: [
                     Text(
                       'Supported Formats',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                     SizedBox(height: 8),
-                    Text('• CSV files exported from your bank\'s net banking portal.'),
+                    Text(
+                        '• CSV files exported from your bank\'s net banking portal.'),
                     Text('• PDF parsing is not currently supported.'),
                     SizedBox(height: 8),
                     Text(
@@ -106,14 +109,15 @@ class _StatementImportScreenState extends State<StatementImportScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            NeumorphicButton(
+            NeoBrutalButton(
               onPressed: _isLoading ? null : () => _pickAndParseFile(),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: const [
                   Icon(Icons.upload_file),
                   SizedBox(width: 8),
-                  Text('Select CSV File', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text('Select CSV File',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -142,10 +146,8 @@ class _StatementImportScreenState extends State<StatementImportScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        NeumorphicContainer(
-          isInset: true,
+        NeoBrutalCard(
           padding: const EdgeInsets.all(12),
-          borderRadius: 8,
           child: Row(
             children: [
               const Icon(Icons.check_circle, color: Colors.green),
@@ -153,7 +155,8 @@ class _StatementImportScreenState extends State<StatementImportScreen> {
               Expanded(
                 child: Text(
                   'Successfully parsed ${_result!.parsedCount} out of ${_result!.totalRows} rows.',
-                  style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      color: Colors.green, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -167,7 +170,8 @@ class _StatementImportScreenState extends State<StatementImportScreen> {
           ),
         ],
         const SizedBox(height: 16),
-        const Text('Preview of imported transactions:', style: TextStyle(fontWeight: FontWeight.bold)),
+        const Text('Preview of imported transactions:',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         const SizedBox(height: 8),
         Expanded(
           child: ListView.builder(
@@ -175,12 +179,16 @@ class _StatementImportScreenState extends State<StatementImportScreen> {
             itemBuilder: (context, index) {
               final tx = _result!.transactions[index];
               return ListTile(
-                title: Text(tx.note ?? tx.category, maxLines: 1, overflow: TextOverflow.ellipsis),
-                subtitle: Text('${tx.date.day}/${tx.date.month}/${tx.date.year} • ${tx.paymentMethod}'),
+                title: Text(tx.note ?? tx.category,
+                    maxLines: 1, overflow: TextOverflow.ellipsis),
+                subtitle: Text(
+                    '${tx.date.day}/${tx.date.month}/${tx.date.year} • ${tx.paymentMethod}'),
                 trailing: Text(
                   '₹${tx.amount.toStringAsFixed(2)}',
                   style: TextStyle(
-                    color: tx.type == app.TransactionType.income ? Colors.green : Colors.red,
+                    color: tx.type == app.TransactionType.income
+                        ? Colors.green
+                        : Colors.red,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -189,7 +197,7 @@ class _StatementImportScreenState extends State<StatementImportScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        NeumorphicButton(
+        NeoBrutalButton(
           onPressed: _saveTransactions,
           child: Center(
             child: Text(

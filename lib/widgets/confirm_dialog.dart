@@ -39,7 +39,7 @@ class ConfirmDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return AlertDialog(
       title: Text(title),
       content: Text(content),
@@ -50,7 +50,7 @@ class ConfirmDialog extends StatelessWidget {
         ),
         FilledButton(
           onPressed: () => Navigator.of(context).pop(true),
-          style: isDestructive 
+          style: isDestructive
               ? FilledButton.styleFrom(backgroundColor: theme.colorScheme.error)
               : null,
           child: Text(confirmText),

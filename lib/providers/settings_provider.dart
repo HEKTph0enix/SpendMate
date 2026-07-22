@@ -10,10 +10,12 @@ class SettingsProvider extends ChangeNotifier {
 
   User? _currentUser;
   String _userName = 'You';
+  bool _enableIncomeDetection = false;
 
   User? get currentUser => _currentUser;
   String get userName => _userName;
   String get currentUserId => _currentUser?.id ?? '';
+  bool get enableIncomeDetection => _enableIncomeDetection;
 
   Future<void> initialize() async {
     _currentUser = await _userRepo.ensureCurrentUser();
@@ -30,6 +32,8 @@ class SettingsProvider extends ChangeNotifier {
       }
     }
 
+    _enableIncomeDetection = prefs.getBool('enable_income_detection') ?? false;
+
     notifyListeners();
   }
 
@@ -41,6 +45,13 @@ class SettingsProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('user_name', name);
 
+    notifyListeners();
+  }
+
+  Future<void> toggleIncomeDetection(bool value) async {
+    _enableIncomeDetection = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('enable_income_detection', value);
     notifyListeners();
   }
 }

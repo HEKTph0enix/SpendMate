@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import '../utils/currency_formatter.dart';
 import '../constants/app_constants.dart';
-import 'neumorphic/neumorphic_card.dart';
-import 'neumorphic/neumorphic_container.dart';
+import '../core/theme/app_colors.dart';
+import '../core/theme/app_spacing.dart';
+import '../core/theme/app_text_styles.dart';
+import 'neobrutal/neobrutal_card.dart';
 
 class BudgetProgressCard extends StatelessWidget {
   final double limitAmount;
@@ -18,127 +20,130 @@ class BudgetProgressCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final remainingAmount = limitAmount - usedAmount > 0 ? limitAmount - usedAmount : 0.0;
-    
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final remainingAmount =
+        limitAmount - usedAmount > 0 ? limitAmount - usedAmount : 0.0;
+
     double usagePercentage = limitAmount > 0 ? usedAmount / limitAmount : 0.0;
-    
+
     // Status colors
     Color statusColor;
     String statusText;
-    
+
     if (usagePercentage < AppConstants.budgetSafeThreshold) {
-      statusColor = Colors.green;
+      statusColor = AppColors.accentGreen;
       statusText = 'On Track';
     } else if (usagePercentage < AppConstants.budgetWarningThreshold) {
-      statusColor = Colors.orange;
+      statusColor = AppColors.accentOrange;
       statusText = 'Nearing Limit';
     } else {
-      statusColor = Colors.red;
+      statusColor = AppColors.error;
       statusText = 'Over Budget';
       if (usagePercentage > 1.0) usagePercentage = 1.0;
     }
 
-    return NeumorphicCard(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: NeoBrutalCard(
+        onTap: onTap,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Monthly Budget',
-                    style: theme.textTheme.titleMedium,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Monthly Budget', style: AppTextStyles.cardTitle(isDark)),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: statusColor,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(
+                        color: AppColors.getBorder(isDark), width: 1.5),
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: statusColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
+                  child: Text(
+                    statusText,
+                    style: const TextStyle(
+                      fontSize: 11,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w700,
                     ),
-                    child: Text(
-                      statusText,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: statusColor,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        CurrencyFormatter.format(usedAmount),
-                        style: theme.textTheme.headlineMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'of ${CurrencyFormatter.format(limitAmount)} used',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(
-                        CurrencyFormatter.format(remainingAmount),
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          color: statusColor,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'left',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              NeumorphicContainer(
-                isInset: true,
-                height: 10,
-                borderRadius: 8,
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      return Container(
-                        width: constraints.maxWidth * usagePercentage,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: statusColor,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      );
-                    },
                   ),
                 ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      CurrencyFormatter.format(usedAmount),
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'of ${CurrencyFormatter.format(limitAmount)} used',
+                      style: AppTextStyles.bodySmall(isDark),
+                    ),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      CurrencyFormatter.format(remainingAmount),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: statusColor,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text('left', style: AppTextStyles.bodySmall(isDark)),
+                  ],
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            // Progress bar
+            Container(
+              height: 12,
+              decoration: BoxDecoration(
+                color: AppColors.getSurface(isDark),
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: AppColors.getBorder(isDark),
+                  width: 1.5,
+                ),
               ),
-            ],
-          ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Container(
+                      width: constraints.maxWidth * usagePercentage,
+                      height: 12,
+                      decoration: BoxDecoration(
+                        color: statusColor,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
 }

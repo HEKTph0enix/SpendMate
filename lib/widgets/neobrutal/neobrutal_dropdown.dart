@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'neumorphic_container.dart';
-import '../../core/theme/app_spacing.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_spacing.dart';
 
-class NeumorphicDropdown<T> extends StatelessWidget {
+/// A neobrutalist dropdown with thick border and hard shadow.
+class NeoBrutalDropdown<T> extends StatelessWidget {
   final T? value;
   final List<DropdownMenuItem<T>> items;
   final ValueChanged<T?>? onChanged;
   final String? labelText;
   final Widget? prefixIcon;
 
-  const NeumorphicDropdown({
+  const NeoBrutalDropdown({
     super.key,
     required this.value,
     required this.items,
@@ -33,16 +33,28 @@ class NeumorphicDropdown<T> extends StatelessWidget {
             child: Text(
               labelText!,
               style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppColors.getTextSecondary(isDark),
+                fontWeight: FontWeight.w700,
+                color: AppColors.getTextPrimary(isDark),
               ),
             ),
           ),
         ],
-        NeumorphicContainer(
-          isInset: true,
-          borderRadius: AppSpacing.radiusMd,
-          padding: EdgeInsets.zero,
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.getSurface(isDark),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            border: Border.all(
+              color: AppColors.getBorder(isDark),
+              width: AppSpacing.borderWidth,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.getBorder(isDark),
+                offset: const Offset(3, 3),
+                blurRadius: 0,
+              ),
+            ],
+          ),
           child: DropdownButtonFormField<T>(
             value: value,
             items: items,
@@ -63,7 +75,7 @@ class NeumorphicDropdown<T> extends StatelessWidget {
             ),
             icon: const Icon(Icons.keyboard_arrow_down),
             dropdownColor: AppColors.getSurface(isDark),
-            borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
           ),
         ),
       ],

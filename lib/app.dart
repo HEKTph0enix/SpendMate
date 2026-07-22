@@ -14,19 +14,17 @@ import 'providers/financial_dashboard_provider.dart';
 import 'providers/cash_wallet_provider.dart';
 import 'providers/analytics_provider.dart';
 import 'providers/savings_provider.dart';
+import 'providers/income_detection_provider.dart';
 
 import 'core/theme/app_theme.dart';
 import 'constants/app_constants.dart';
-import 'widgets/neumorphic/neumorphic_bottom_navigation.dart';
+import 'widgets/neobrutal/neobrutal_bottom_nav.dart';
 import 'screens/expenses/add_expense_screen.dart';
-// Legacy screens
+// Screens
 import 'screens/groups/groups_screen.dart';
 import 'screens/settings/settings_screen.dart';
-
-// New screens
 import 'screens/dashboard_screen.dart';
 import 'screens/enhanced_statistics_screen.dart';
-import 'screens/savings_screen.dart';
 
 class SpendMateApp extends StatelessWidget {
   const SpendMateApp({super.key});
@@ -38,22 +36,28 @@ class SpendMateApp extends StatelessWidget {
         // Legacy providers
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => SettingsProvider()..initialize()),
-        ChangeNotifierProvider(create: (_) => ExpenseProvider()..loadExpenses()),
+        ChangeNotifierProvider(
+            create: (_) => ExpenseProvider()..loadExpenses()),
         ChangeNotifierProvider(create: (_) => GroupProvider()..loadGroups()),
         ChangeNotifierProxyProvider<SettingsProvider, BudgetProvider>(
-          create: (context) => BudgetProvider(Provider.of<SettingsProvider>(context, listen: false)),
-          update: (context, settings, previous) => previous ?? BudgetProvider(settings),
+          create: (context) => BudgetProvider(
+              Provider.of<SettingsProvider>(context, listen: false)),
+          update: (context, settings, previous) =>
+              previous ?? BudgetProvider(settings),
         ),
         ChangeNotifierProxyProvider<SettingsProvider, StatisticsProvider>(
-          create: (context) => StatisticsProvider(Provider.of<SettingsProvider>(context, listen: false)),
-          update: (context, settings, previous) => previous ?? StatisticsProvider(settings),
+          create: (context) => StatisticsProvider(
+              Provider.of<SettingsProvider>(context, listen: false)),
+          update: (context, settings, previous) =>
+              previous ?? StatisticsProvider(settings),
         ),
-        
+
         // New providers
         ChangeNotifierProvider(create: (_) => FinancialDashboardProvider()),
         ChangeNotifierProvider(create: (_) => CashWalletProvider()),
         ChangeNotifierProvider(create: (_) => AnalyticsProvider()),
         ChangeNotifierProvider(create: (_) => SavingsProvider()),
+        ChangeNotifierProvider(create: (_) => IncomeDetectionProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, child) {
@@ -81,12 +85,12 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    const DashboardScreen(),
-    const EnhancedStatisticsScreen(),
-    const SavingsScreen(),
-    const GroupsScreen(),
-    const SettingsScreen(),
+  // 0 = Dashboard, 1 = Insights, 2 = Groups, 3 = Settings
+  final List<Widget> _screens = const [
+    DashboardScreen(),
+    EnhancedStatisticsScreen(),
+    GroupsScreen(),
+    SettingsScreen(),
   ];
 
   @override
@@ -96,7 +100,7 @@ class _MainScreenState extends State<MainScreen> {
         index: _currentIndex,
         children: _screens,
       ),
-      bottomNavigationBar: NeumorphicBottomNavigation(
+      bottomNavigationBar: NeoBrutalBottomNav(
         selectedIndex: _currentIndex,
         onItemSelected: (index) {
           setState(() {

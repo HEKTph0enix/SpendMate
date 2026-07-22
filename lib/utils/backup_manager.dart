@@ -91,12 +91,10 @@ class BackupManager {
 
   /// Create a full backup of all data.
   Future<BackupData> createBackup() async {
-    final users = (await _db.query('users'))
-        .map((m) => User.fromMap(m))
-        .toList();
-    final expenses = (await _db.query('expenses'))
-        .map((m) => Expense.fromMap(m))
-        .toList();
+    final users =
+        (await _db.query('users')).map((m) => User.fromMap(m)).toList();
+    final expenses =
+        (await _db.query('expenses')).map((m) => Expense.fromMap(m)).toList();
     final groups = (await _db.query('expense_groups'))
         .map((m) => ExpenseGroup.fromMap(m))
         .toList();
@@ -109,9 +107,8 @@ class BackupManager {
     final settlements = (await _db.query('settlements'))
         .map((m) => Settlement.fromMap(m))
         .toList();
-    final budgets = (await _db.query('budgets'))
-        .map((m) => Budget.fromMap(m))
-        .toList();
+    final budgets =
+        (await _db.query('budgets')).map((m) => Budget.fromMap(m)).toList();
 
     return BackupData(
       users: users,

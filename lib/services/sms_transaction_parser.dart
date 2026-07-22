@@ -14,22 +14,30 @@ class SmsTransactionParser {
   // Common Indian bank SMS patterns
   static final List<RegExp> _debitPatterns = [
     // "Rs.500.00 debited from A/c XXXX1234"
-    RegExp(r'Rs\.?\s?(\d+[\d,]*\.?\d*)\s*(?:has been\s+)?debited', caseSensitive: false),
+    RegExp(r'Rs\.?\s?(\d+[\d,]*\.?\d*)\s*(?:has been\s+)?debited',
+        caseSensitive: false),
     // "INR 500.00 withdrawn"
-    RegExp(r'INR\s?(\d+[\d,]*\.?\d*)\s*(?:has been\s+)?(?:withdrawn|debited)', caseSensitive: false),
+    RegExp(r'INR\s?(\d+[\d,]*\.?\d*)\s*(?:has been\s+)?(?:withdrawn|debited)',
+        caseSensitive: false),
     // "Spent Rs 500"
-    RegExp(r'(?:Spent|spent)\s+Rs\.?\s?(\d+[\d,]*\.?\d*)', caseSensitive: false),
+    RegExp(r'(?:Spent|spent)\s+Rs\.?\s?(\d+[\d,]*\.?\d*)',
+        caseSensitive: false),
     // "Txn of Rs 500.00"
-    RegExp(r'(?:Txn|txn|transaction)\s+of\s+Rs\.?\s?(\d+[\d,]*\.?\d*)', caseSensitive: false),
+    RegExp(r'(?:Txn|txn|transaction)\s+of\s+Rs\.?\s?(\d+[\d,]*\.?\d*)',
+        caseSensitive: false),
   ];
 
   static final List<RegExp> _creditPatterns = [
     // "Rs.500.00 credited to A/c XXXX1234"
-    RegExp(r'Rs\.?\s?(\d+[\d,]*\.?\d*)\s*(?:has been\s+)?credited', caseSensitive: false),
+    RegExp(r'Rs\.?\s?(\d+[\d,]*\.?\d*)\s*(?:has been\s+)?credited',
+        caseSensitive: false),
     // "INR 500.00 deposited"
-    RegExp(r'INR\s?(\d+[\d,]*\.?\d*)\s*(?:has been\s+)?(?:deposited|credited|received)', caseSensitive: false),
+    RegExp(
+        r'INR\s?(\d+[\d,]*\.?\d*)\s*(?:has been\s+)?(?:deposited|credited|received)',
+        caseSensitive: false),
     // "Received Rs 500"
-    RegExp(r'(?:Received|received)\s+Rs\.?\s?(\d+[\d,]*\.?\d*)', caseSensitive: false),
+    RegExp(r'(?:Received|received)\s+Rs\.?\s?(\d+[\d,]*\.?\d*)',
+        caseSensitive: false),
   ];
 
   // Account number patterns
@@ -46,7 +54,8 @@ class SmsTransactionParser {
 
   // UPI app detection
   static final Map<RegExp, String> _upiAppPatterns = {
-    RegExp(r'(?:Google\s*Pay|GPay|GOOGLEPAY)', caseSensitive: false): 'UPI - Google Pay',
+    RegExp(r'(?:Google\s*Pay|GPay|GOOGLEPAY)', caseSensitive: false):
+        'UPI - Google Pay',
     RegExp(r'(?:PhonePe|PHONEPE)', caseSensitive: false): 'UPI - PhonePe',
     RegExp(r'(?:Paytm|PAYTM)', caseSensitive: false): 'UPI - Paytm',
   };
@@ -146,11 +155,13 @@ class SmsTransactionParser {
     // Generic UPI detection
     if (_upiPattern.hasMatch(body)) return 'UPI';
     // Check for card
-    if (RegExp(r'(?:card|debit\s*card|credit\s*card)', caseSensitive: false).hasMatch(body)) {
+    if (RegExp(r'(?:card|debit\s*card|credit\s*card)', caseSensitive: false)
+        .hasMatch(body)) {
       return 'Card';
     }
     // Check for net banking
-    if (RegExp(r'(?:net\s*banking|NEFT|RTGS|IMPS)', caseSensitive: false).hasMatch(body)) {
+    if (RegExp(r'(?:net\s*banking|NEFT|RTGS|IMPS)', caseSensitive: false)
+        .hasMatch(body)) {
       return 'Net Banking';
     }
     return 'Bank Transfer';

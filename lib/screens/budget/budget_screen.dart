@@ -5,9 +5,8 @@ import '../../providers/budget_provider.dart';
 import '../../utils/currency_formatter.dart';
 import '../../utils/validators.dart';
 import '../../constants/app_constants.dart';
-import '../../widgets/neumorphic/neumorphic_text_field.dart';
-import '../../widgets/neumorphic/neumorphic_card.dart';
-import '../../widgets/neumorphic/neumorphic_container.dart';
+import '../../widgets/neobrutal/neobrutal_text_field.dart';
+import '../../widgets/neobrutal/neobrutal_card.dart';
 
 class BudgetScreen extends StatefulWidget {
   const BudgetScreen({super.key});
@@ -44,7 +43,7 @@ class _BudgetScreenState extends State<BudgetScreen> {
     setState(() => _isLoading = true);
 
     final amount = Validators.parseAmount(_amountController.text) ?? 0.0;
-    
+
     final provider = Provider.of<BudgetProvider>(context, listen: false);
     await provider.setBudget(amount);
 
@@ -89,22 +88,21 @@ class _BudgetScreenState extends State<BudgetScreen> {
                   style: TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 32),
-                
-                NeumorphicTextField(
+                NeoBrutalTextField(
                   controller: _amountController,
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
                   labelText: 'Budget Amount',
                   prefixText: '₹ ',
-                  style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 32, fontWeight: FontWeight.bold),
                   validator: Validators.amount,
                 ),
                 const SizedBox(height: 32),
-
                 if (provider.hasBudget) ...[
                   Text('Current Status', style: theme.textTheme.titleLarge),
                   const SizedBox(height: 16),
-                  
-                  NeumorphicCard(
+                  NeoBrutalCard(
                     child: Column(
                       children: [
                         Row(
@@ -126,28 +124,44 @@ class _BudgetScreenState extends State<BudgetScreen> {
                           children: [
                             const Text('Remaining'),
                             Text(
-                              CurrencyFormatter.format(provider.remainingAmount),
+                              CurrencyFormatter.format(
+                                  provider.remainingAmount),
                               style: theme.textTheme.titleMedium?.copyWith(
-                                color: provider.isSafe ? Colors.green : (provider.isWarning ? Colors.orange : Colors.red),
+                                color: provider.isSafe
+                                    ? Colors.green
+                                    : (provider.isWarning
+                                        ? Colors.orange
+                                        : Colors.red),
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 24),
-                        NeumorphicContainer(
-                          isInset: true,
+                        Container(
                           height: 12,
-                          borderRadius: 6,
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: theme.colorScheme.outline,
+                              width: 1.5,
+                            ),
+                          ),
                           child: Align(
                             alignment: Alignment.centerLeft,
                             child: LayoutBuilder(
                               builder: (context, constraints) {
                                 return Container(
-                                  width: constraints.maxWidth * provider.usagePercentage.clamp(0.0, 1.0),
+                                  width: constraints.maxWidth *
+                                      provider.usagePercentage.clamp(0.0, 1.0),
                                   height: 12,
                                   decoration: BoxDecoration(
-                                    color: provider.isSafe ? Colors.green : (provider.isWarning ? Colors.orange : Colors.red),
+                                    color: provider.isSafe
+                                        ? Colors.green
+                                        : (provider.isWarning
+                                            ? Colors.orange
+                                            : Colors.red),
                                     borderRadius: BorderRadius.circular(6),
                                   ),
                                 );

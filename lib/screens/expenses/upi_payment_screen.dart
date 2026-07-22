@@ -9,9 +9,13 @@ import '../../models/expense.dart';
 import '../../providers/budget_provider.dart';
 import '../../providers/expense_provider.dart';
 import '../../providers/statistics_provider.dart';
+import '../../providers/financial_dashboard_provider.dart';
+import '../../providers/cash_wallet_provider.dart';
+import '../../providers/analytics_provider.dart';
 import '../../utils/validators.dart';
-import '../../widgets/neumorphic/neumorphic_text_field.dart';
-import '../../widgets/neumorphic/neumorphic_button.dart';
+import '../../widgets/neobrutal/neobrutal_text_field.dart';
+import '../../widgets/neobrutal/neobrutal_button.dart';
+import 'qr_scanner_screen.dart';
 
 /// Opens an installed UPI application and records the expense after the user
 /// manually confirms that the payment succeeded.
@@ -29,8 +33,7 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final TextEditingController _upiIdController = TextEditingController();
-  final TextEditingController _payeeNameController =
-  TextEditingController();
+  final TextEditingController _payeeNameController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
 
@@ -65,6 +68,24 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
 
       return '$encodedKey=$encodedValue';
     }).join('&');
+  }
+
+  Future<void> _scanQR() async {
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const QRScannerScreen()),
+    );
+
+    if (result != null && result is Map<String, String>) {
+      setState(() {
+        if (result['upiId'] != null && result['upiId']!.isNotEmpty) {
+          _upiIdController.text = result['upiId']!;
+        }
+        if (result['name'] != null && result['name']!.isNotEmpty) {
+          _payeeNameController.text = result['name']!;
+        }
+      });
+    }
   }
 
   Future<void> _initiateUpiPayment() async {
@@ -117,7 +138,7 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
 
         _showMessage(
           'Unable to open a UPI app. Make sure Google Pay, PhonePe, '
-              'Paytm or BHIM is installed.',
+          'Paytm or BHIM is installed.',
           isError: true,
         );
         return;
@@ -229,7 +250,7 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
         amount: amount,
         dateTime: DateTime.now(),
         category: _selectedCategory,
-        paymentMethod: 'UPI',
+        paymentMethod: 'Online Transaction',
         note: note,
         upiId: upiId,
         payeeName: payeeName,
@@ -237,8 +258,7 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
         paymentStatus: 'completed',
       );
 
-      final ExpenseProvider expenseProvider =
-      Provider.of<ExpenseProvider>(
+      final ExpenseProvider expenseProvider = Provider.of<ExpenseProvider>(
         context,
         listen: false,
       );
@@ -249,6 +269,9 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
 
       context.read<BudgetProvider>().loadCurrentBudget();
       context.read<StatisticsProvider>().loadStatistics();
+      context.read<FinancialDashboardProvider>().refreshDashboard();
+      context.read<CashWalletProvider>().refreshWallet();
+      context.read<AnalyticsProvider>().loadAnalytics();
 
       _showMessage(
         'UPI payment recorded successfully',
@@ -292,10 +315,10 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
   }
 
   void _showMessage(
-      String message, {
-        bool isError = false,
-        bool isSuccess = false,
-      }) {
+    String message, {
+    bool isError = false,
+    bool isSuccess = false,
+  }) {
     if (!mounted) return;
 
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
@@ -306,8 +329,8 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
         backgroundColor: isError
             ? Colors.red
             : isSuccess
-            ? Colors.green
-            : null,
+                ? Colors.green
+                : null,
       ),
     );
   }
@@ -367,6 +390,13 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
             ),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: _scanQR,
+        icon: const Icon(Icons.qr_code_scanner),
+        label: const Text('Scan QR'),
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: theme.colorScheme.onPrimary,
+      ),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -391,11 +421,10 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
                   Expanded(
                     child: Text(
                       'This opens an installed UPI app to complete the '
-                          'payment. When you return, confirm whether the '
-                          'payment succeeded.',
+                      'payment. When you return, confirm whether the '
+                      'payment succeeded.',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color:
-                        theme.colorScheme.onSurfaceVariant,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -403,8 +432,7 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
-            NeumorphicTextField(
+            NeoBrutalTextField(
               controller: _upiIdController,
               labelText: 'Payee UPI ID',
               hintText: 'Example: name@okaxis',
@@ -414,8 +442,7 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
               validator: Validators.upiId,
             ),
             const SizedBox(height: 20),
-
-            NeumorphicTextField(
+            NeoBrutalTextField(
               controller: _payeeNameController,
               labelText: 'Payee Name',
               prefixIcon: const Icon(Icons.person_outline),
@@ -424,8 +451,7 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
               validator: Validators.payeeName,
             ),
             const SizedBox(height: 20),
-
-            NeumorphicTextField(
+            NeoBrutalTextField(
               controller: _amountController,
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
@@ -442,8 +468,7 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
                   return 'Amount is required';
                 }
 
-                final double? parsed =
-                double.tryParse(value.trim());
+                final double? parsed = double.tryParse(value.trim());
 
                 if (parsed == null) {
                   return 'Enter a valid amount';
@@ -457,20 +482,17 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
               },
             ),
             const SizedBox(height: 24),
-
             Text(
               'Category',
               style: theme.textTheme.titleMedium,
             ),
             const SizedBox(height: 12),
-
             Wrap(
               spacing: 8,
               runSpacing: 12,
               children: AppConstants.categories.map(
-                    (String category) {
-                  final bool isSelected =
-                      _selectedCategory == category;
+                (String category) {
+                  final bool isSelected = _selectedCategory == category;
 
                   return ChoiceChip(
                     label: Text(category),
@@ -500,8 +522,7 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
               ).toList(),
             ),
             const SizedBox(height: 24),
-
-            NeumorphicTextField(
+            NeoBrutalTextField(
               controller: _noteController,
               labelText: 'Note (Optional)',
               prefixIcon: const Icon(Icons.notes),
@@ -514,11 +535,9 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
               },
             ),
             const SizedBox(height: 32),
-
-            NeumorphicButton(
-              onPressed: (_isLaunching || _isSaving)
-                  ? null
-                  : _initiateUpiPayment,
+            NeoBrutalButton(
+              onPressed:
+                  (_isLaunching || _isSaving) ? null : _initiateUpiPayment,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -537,8 +556,8 @@ class _UpiPaymentScreenState extends State<UpiPaymentScreen> {
                     _isLaunching
                         ? 'Opening UPI App...'
                         : _isSaving
-                        ? 'Saving Payment...'
-                        : 'Pay Using UPI',
+                            ? 'Saving Payment...'
+                            : 'Pay Using UPI',
                   ),
                 ],
               ),

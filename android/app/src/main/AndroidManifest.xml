@@ -5,6 +5,7 @@
             <data android:scheme="upi" />
         </intent>
     </queries>
+    <uses-permission android:name="android.permission.CAMERA" />
     <application
         android:label="spendmate"
         android:name="${applicationName}"
@@ -36,6 +37,16 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <service
+            android:name=".IncomeNotificationService"
+            android:label="SpendMate Notification Listener"
+            android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.service.notification.NotificationListenerService" />
+            </intent-filter>
+        </service>
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and

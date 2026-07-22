@@ -62,11 +62,13 @@ class User {
   factory User.fromJson(Map<String, dynamic> json) => User.fromMap(json);
 
   @override
-  String toString() => 'User(id: $id, name: $name, isCurrentUser: $isCurrentUser)';
+  String toString() =>
+      'User(id: $id, name: $name, isCurrentUser: $isCurrentUser)';
 
   @override
   bool operator ==(Object other) =>
-      identical(this, other) || other is User && runtimeType == other.runtimeType && id == other.id;
+      identical(this, other) ||
+      other is User && runtimeType == other.runtimeType && id == other.id;
 
   @override
   int get hashCode => id.hashCode;

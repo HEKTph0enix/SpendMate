@@ -23,16 +23,20 @@ class BudgetProvider extends ChangeNotifier {
 
   bool get hasBudget => _currentBudget != null;
   double get limitAmount => _currentBudget?.limitAmount ?? 0.0;
-  double get remainingAmount => limitAmount - _currentUsage > 0 ? limitAmount - _currentUsage : 0.0;
-  
+  double get remainingAmount =>
+      limitAmount - _currentUsage > 0 ? limitAmount - _currentUsage : 0.0;
+
   double get usagePercentage {
     if (!hasBudget || limitAmount == 0) return 0.0;
     return _currentUsage / limitAmount;
   }
 
   bool get isSafe => usagePercentage < AppConstants.budgetSafeThreshold;
-  bool get isWarning => usagePercentage >= AppConstants.budgetSafeThreshold && usagePercentage < AppConstants.budgetWarningThreshold;
-  bool get isOverBudget => usagePercentage >= AppConstants.budgetWarningThreshold;
+  bool get isWarning =>
+      usagePercentage >= AppConstants.budgetSafeThreshold &&
+      usagePercentage < AppConstants.budgetWarningThreshold;
+  bool get isOverBudget =>
+      usagePercentage >= AppConstants.budgetWarningThreshold;
 
   BudgetProvider(this._settingsProvider) {
     loadCurrentBudget();
@@ -48,7 +52,8 @@ class BudgetProvider extends ChangeNotifier {
     if (_currentBudget != null) {
       final start = DateFormatter.startOfMonth(now);
       final end = DateFormatter.endOfMonth(now);
-      _currentUsage = await _expenseRepo.getPersonalSpendingTotal(start, end, _settingsProvider.currentUserId);
+      _currentUsage = await _expenseRepo.getPersonalSpendingTotal(
+          start, end, _settingsProvider.currentUserId);
     } else {
       _currentUsage = 0.0;
     }

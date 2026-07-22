@@ -133,16 +133,23 @@ class DatabaseHelper {
 
     // V1 indexes
     await db.execute('CREATE INDEX idx_expenses_date ON expenses (date_time)');
-    await db.execute('CREATE INDEX idx_expenses_category ON expenses (category)');
+    await db
+        .execute('CREATE INDEX idx_expenses_category ON expenses (category)');
     await db.execute('CREATE INDEX idx_expenses_group ON expenses (group_id)');
-    await db.execute('CREATE INDEX idx_group_members_group ON group_members (group_id)');
-    await db.execute('CREATE INDEX idx_group_splits_expense ON group_splits (expense_id)');
-    await db.execute('CREATE INDEX idx_settlements_group ON settlements (group_id)');
-    await db.execute('CREATE UNIQUE INDEX idx_budgets_month_year ON budgets (month, year)');
+    await db.execute(
+        'CREATE INDEX idx_group_members_group ON group_members (group_id)');
+    await db.execute(
+        'CREATE INDEX idx_group_splits_expense ON group_splits (expense_id)');
+    await db.execute(
+        'CREATE INDEX idx_settlements_group ON settlements (group_id)');
+    await db.execute(
+        'CREATE UNIQUE INDEX idx_budgets_month_year ON budgets (month, year)');
 
     // ─── V2 Tables (financial dashboard) ────────────────────────────
 
     await _createV2Tables(db);
+    await _createV3Columns(db);
+    await _createV4Tables(db);
   }
 
   Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
@@ -152,15 +159,47 @@ class DatabaseHelper {
     if (oldVersion < 3) {
       await _createV3Columns(db);
     }
+    if (oldVersion < 4) {
+      await _createV4Tables(db);
+    }
   }
 
   /// V3 migration: add optional UPI / source columns to expenses table.
+  /// Each ALTER is wrapped in try-catch because on fresh installs, these
+  /// columns already exist in the CREATE TABLE statement.
   Future<void> _createV3Columns(Database db) async {
-    await db.execute('ALTER TABLE expenses ADD COLUMN payee_name TEXT');
-    await db.execute('ALTER TABLE expenses ADD COLUMN upi_id TEXT');
-    await db.execute('ALTER TABLE expenses ADD COLUMN transaction_ref TEXT');
-    await db.execute("ALTER TABLE expenses ADD COLUMN payment_status TEXT DEFAULT 'completed'");
-    await db.execute("ALTER TABLE expenses ADD COLUMN source TEXT DEFAULT 'manual'");
+    final columns = [
+      'ALTER TABLE expenses ADD COLUMN payee_name TEXT',
+      'ALTER TABLE expenses ADD COLUMN upi_id TEXT',
+      'ALTER TABLE expenses ADD COLUMN transaction_ref TEXT',
+      "ALTER TABLE expenses ADD COLUMN payment_status TEXT DEFAULT 'completed'",
+      "ALTER TABLE expenses ADD COLUMN source TEXT DEFAULT 'manual'",
+    ];
+    for (final sql in columns) {
+      try {
+        await db.execute(sql);
+      } catch (_) {
+        // Column already exists — safe to ignore
+      }
+    }
+  }
+
+  Future<void> _createV4Tables(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS detected_transactions (
+        id TEXT PRIMARY KEY,
+        fingerprint TEXT NOT NULL,
+        package_name TEXT NOT NULL,
+        notification_title TEXT NOT NULL,
+        notification_text TEXT NOT NULL,
+        amount REAL NOT NULL,
+        sender_name TEXT,
+        timestamp TEXT NOT NULL,
+        confidence_score REAL NOT NULL,
+        status TEXT NOT NULL DEFAULT 'pending'
+      )
+    ''');
+    await db.execute('CREATE INDEX IF NOT EXISTS idx_detected_fingerprint ON detected_transactions (fingerprint)');
   }
 
   Future<void> _createV2Tables(Database db) async {
@@ -220,18 +259,24 @@ class DatabaseHelper {
     ''');
 
     // V2 indexes
-    await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions (date)');
-    await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_account ON transactions (account_id)');
-    await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions (category)');
-    await db.execute('CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions (type)');
-    await db.execute('CREATE INDEX IF NOT EXISTS idx_financial_accounts_active ON financial_accounts (is_active)');
+    await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions (date)');
+    await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_transactions_account ON transactions (account_id)');
+    await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_transactions_category ON transactions (category)');
+    await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_transactions_type ON transactions (type)');
+    await db.execute(
+        'CREATE INDEX IF NOT EXISTS idx_financial_accounts_active ON financial_accounts (is_active)');
   }
 
   // ─── Generic CRUD ──────────────────────────────────────────────────
 
   Future<int> insert(String table, Map<String, dynamic> data) async {
     final db = await database;
-    return await db.insert(table, data, conflictAlgorithm: ConflictAlgorithm.replace);
+    return await db.insert(table, data,
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   Future<List<Map<String, dynamic>>> query(
@@ -272,14 +317,16 @@ class DatabaseHelper {
     return await db.delete(table, where: where, whereArgs: whereArgs);
   }
 
-  Future<List<Map<String, dynamic>>> rawQuery(String sql, [List<dynamic>? arguments]) async {
+  Future<List<Map<String, dynamic>>> rawQuery(String sql,
+      [List<dynamic>? arguments]) async {
     final db = await database;
     return await db.rawQuery(sql, arguments);
   }
 
   // ─── Transaction Support ───────────────────────────────────────────
 
-  Future<T> runTransaction<T>(Future<T> Function(Transaction txn) action) async {
+  Future<T> runTransaction<T>(
+      Future<T> Function(Transaction txn) action) async {
     final db = await database;
     return await db.transaction(action);
   }
@@ -292,20 +339,24 @@ class DatabaseHelper {
   ) async {
     final db = await database;
     await db.transaction((txn) async {
-      await txn.insert('expenses', expense, conflictAlgorithm: ConflictAlgorithm.replace);
+      await txn.insert('expenses', expense,
+          conflictAlgorithm: ConflictAlgorithm.replace);
       for (final split in splits) {
-        await txn.insert('group_splits', split, conflictAlgorithm: ConflictAlgorithm.replace);
+        await txn.insert('group_splits', split,
+            conflictAlgorithm: ConflictAlgorithm.replace);
       }
     });
   }
 
   // ─── Bulk insert for imported transactions ─────────────────────────
 
-  Future<void> insertBulkTransactions(List<Map<String, dynamic>> transactions) async {
+  Future<void> insertBulkTransactions(
+      List<Map<String, dynamic>> transactions) async {
     final db = await database;
     await db.transaction((txn) async {
       for (final tx in transactions) {
-        await txn.insert('transactions', tx, conflictAlgorithm: ConflictAlgorithm.replace);
+        await txn.insert('transactions', tx,
+            conflictAlgorithm: ConflictAlgorithm.replace);
       }
     });
   }
@@ -335,6 +386,7 @@ class DatabaseHelper {
       await txn.delete('recurring_expenses');
       await txn.delete('financial_accounts');
       await txn.delete('cash_wallet');
+      await txn.delete('detected_transactions');
     });
   }
 
@@ -353,6 +405,7 @@ class DatabaseHelper {
       await txn.delete('recurring_expenses');
       await txn.delete('financial_accounts');
       await txn.delete('cash_wallet');
+      await txn.delete('detected_transactions');
       await txn.delete('users');
     });
   }
@@ -363,4 +416,3 @@ class DatabaseHelper {
     _database = null;
   }
 }
-

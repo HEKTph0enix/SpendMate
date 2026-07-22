@@ -49,7 +49,8 @@ class SplitCalculator {
   }) {
     final splits = <GroupSplit>[];
     for (final entry in memberShares.entries) {
-      final percentage = totalAmount > 0 ? (entry.value / totalAmount * 100) : 0.0;
+      final percentage =
+          totalAmount > 0 ? (entry.value / totalAmount * 100) : 0.0;
       splits.add(GroupSplit(
         id: _uuid.v4(),
         expenseId: expenseId,
@@ -82,8 +83,8 @@ class SplitCalculator {
         // Last person gets the remainder to avoid rounding issues
         amount = totalAmount - allocatedAmount;
       } else {
-        amount = double.parse(
-            (totalAmount * entry.value / 100).toStringAsFixed(2));
+        amount =
+            double.parse((totalAmount * entry.value / 100).toStringAsFixed(2));
         allocatedAmount += amount;
       }
 
@@ -103,7 +104,8 @@ class SplitCalculator {
   // ─── Validation ────────────────────────────────────────────────────
 
   /// Validate that custom split shares sum to the total amount.
-  static bool validateCustomSplit(double totalAmount, Map<String, double> shares) {
+  static bool validateCustomSplit(
+      double totalAmount, Map<String, double> shares) {
     if (shares.isEmpty) return false;
     final sum = shares.values.fold(0.0, (a, b) => a + b);
     return (sum - totalAmount).abs() < 0.01;

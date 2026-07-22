@@ -3,9 +3,9 @@ import 'package:flutter/services.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
-import 'neumorphic_container.dart';
 
-class NeumorphicTextField extends StatelessWidget {
+/// A neobrutalist text field with thick border, hard shadow, and label.
+class NeoBrutalTextField extends StatelessWidget {
   final TextEditingController? controller;
   final String? labelText;
   final String? hintText;
@@ -32,7 +32,7 @@ class NeumorphicTextField extends StatelessWidget {
   final bool? isDense;
   final EdgeInsetsGeometry? contentPadding;
 
-  const NeumorphicTextField({
+  const NeoBrutalTextField({
     super.key,
     this.controller,
     this.labelText,
@@ -66,23 +66,32 @@ class NeumorphicTextField extends StatelessWidget {
       children: [
         if (labelText != null) ...[
           Padding(
-            padding: const EdgeInsets.only(
-              left: 4,
-              bottom: 8,
-            ),
+            padding: const EdgeInsets.only(left: 4, bottom: 8),
             child: Text(
               labelText!,
               style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: AppColors.getTextSecondary(isDark),
+                fontWeight: FontWeight.w700,
+                color: AppColors.getTextPrimary(isDark),
               ),
             ),
           ),
         ],
-        NeumorphicContainer(
-          isInset: true,
-          borderRadius: AppSpacing.radiusMd,
-          padding: EdgeInsets.zero,
+        Container(
+          decoration: BoxDecoration(
+            color: AppColors.getSurface(isDark),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            border: Border.all(
+              color: AppColors.getBorder(isDark),
+              width: AppSpacing.borderWidth,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.getBorder(isDark),
+                offset: const Offset(3, 3),
+                blurRadius: 0,
+              ),
+            ],
+          ),
           child: TextFormField(
             controller: controller,
             enabled: enabled,
@@ -107,8 +116,7 @@ class NeumorphicTextField extends StatelessWidget {
               enabledBorder: InputBorder.none,
               errorBorder: InputBorder.none,
               disabledBorder: InputBorder.none,
-              contentPadding:
-              contentPadding ??
+              contentPadding: contentPadding ??
                   const EdgeInsets.symmetric(
                     horizontal: AppSpacing.md,
                     vertical: AppSpacing.md,

@@ -81,7 +81,8 @@ class FinancialAccountRepository {
   Future<void> deleteAccountAndTransactions(String accountId) async {
     final db = await _db.database;
     await db.transaction((txn) async {
-      await txn.delete('transactions', where: 'account_id = ?', whereArgs: [accountId]);
+      await txn.delete('transactions',
+          where: 'account_id = ?', whereArgs: [accountId]);
       await txn.delete(_table, where: 'id = ?', whereArgs: [accountId]);
     });
   }

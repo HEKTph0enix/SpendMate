@@ -42,9 +42,12 @@ class FinancialDashboardProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> addManualAccount(String name, double initialBalance, String type, String? bankName, String? maskedNumber) async {
+  Future<void> addManualAccount(String name, double initialBalance, String type,
+      String? bankName, String? maskedNumber) async {
     final accountType = AccountType.values.firstWhere(
-      (e) => e.name.toLowerCase() == type.toLowerCase() || (e.name == 'bank' && !['wallet', 'upi'].contains(type.toLowerCase())),
+      (e) =>
+          e.name.toLowerCase() == type.toLowerCase() ||
+          (e.name == 'bank' && !['wallet', 'upi'].contains(type.toLowerCase())),
       orElse: () => AccountType.bank,
     );
 

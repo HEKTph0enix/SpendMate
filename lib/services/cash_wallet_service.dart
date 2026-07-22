@@ -85,12 +85,15 @@ class CashWalletService {
       final tx = app.Transaction(
         id: _uuid.v4(),
         amount: difference.abs(),
-        type: difference > 0 ? app.TransactionType.income : app.TransactionType.expense,
+        type: difference > 0
+            ? app.TransactionType.income
+            : app.TransactionType.expense,
         category: 'Other',
         paymentMethod: 'Cash',
         source: app.TransactionSource.manual,
         date: DateTime.now(),
-        note: 'Balance correction: ${difference > 0 ? '+' : ''}${difference.toStringAsFixed(2)}',
+        note:
+            'Balance correction: ${difference > 0 ? '+' : ''}${difference.toStringAsFixed(2)}',
       );
       await _transactionRepo.insertTransaction(tx);
     }

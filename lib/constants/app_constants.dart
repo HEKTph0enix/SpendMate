@@ -42,13 +42,7 @@ class AppConstants {
   // Payment methods (original 3 kept at top for backward compatibility)
   static const List<String> paymentMethods = [
     'Cash',
-    'UPI',
-    'Card',
-    'UPI - Google Pay',
-    'UPI - PhonePe',
-    'UPI - Paytm',
-    'Net Banking',
-    'Bank Transfer',
+    'Online Transaction',
   ];
 
   // Split types
@@ -96,12 +90,13 @@ class AppConstants {
   static const double anomalyMultiplier = 2.0;
 
   // Savings suggestion thresholds
-  static const double categoryIncreaseThreshold = 0.20; // 20% increase triggers suggestion
+  static const double categoryIncreaseThreshold =
+      0.20; // 20% increase triggers suggestion
   static const double weekendSpendingThreshold = 0.40; // 40% of weekly total
 
   // Database
   static const String dbName = 'spendmate.db';
-  static const int dbVersion = 3;
+  static const int dbVersion = 4;
 
   // Rounding tolerance for settlements
   static const double settlementTolerance = 0.01;

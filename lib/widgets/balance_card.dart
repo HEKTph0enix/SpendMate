@@ -17,9 +17,9 @@ class BalanceCard extends StatelessWidget {
     required this.gradientColors,
     this.onTap,
   }) : assert(
-  gradientColors.length >= 2,
-  'At least two gradient colors are required',
-  );
+          gradientColors.length >= 2,
+          'At least two gradient colors are required',
+        );
 
   @override
   Widget build(BuildContext context) {

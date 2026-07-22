@@ -20,7 +20,8 @@ class BudgetRepository {
     return Budget.fromMap(results.first);
   }
 
-  Future<Budget> setOrUpdateBudget(int month, int year, double limitAmount) async {
+  Future<Budget> setOrUpdateBudget(
+      int month, int year, double limitAmount) async {
     final existing = await getBudgetForMonth(month, year);
     if (existing != null) {
       final updated = existing.copyWith(limitAmount: limitAmount);

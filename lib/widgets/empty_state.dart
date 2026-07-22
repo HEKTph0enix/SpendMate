@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'neumorphic/neumorphic_button.dart';
-import 'neumorphic/neumorphic_container.dart';
+import '../core/theme/app_colors.dart';
+import '../core/theme/app_spacing.dart';
+import '../core/theme/app_text_styles.dart';
+import 'neobrutal/neobrutal_button.dart';
 
 class EmptyState extends StatelessWidget {
   final IconData icon;
@@ -20,49 +22,61 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            NeumorphicContainer(
+            Container(
               padding: const EdgeInsets.all(24),
-              shape: BoxShape.circle,
+              decoration: BoxDecoration(
+                color: AppColors.getCardAccentColors(isDark)[0],
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppColors.getBorder(isDark),
+                  width: AppSpacing.borderWidth,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.getBorder(isDark),
+                    offset: const Offset(4, 4),
+                    blurRadius: 0,
+                  ),
+                ],
+              ),
               child: Icon(
                 icon,
-                size: 64,
-                color: theme.colorScheme.primary,
+                size: 56,
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(height: 24),
             Text(
               title,
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
+              style: AppTextStyles.sectionHeading(isDark),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(
               message,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
+              style: AppTextStyles.body(isDark).copyWith(
+                color: AppColors.getTextSecondary(isDark),
               ),
               textAlign: TextAlign.center,
             ),
             if (buttonText != null && onButtonPressed != null) ...[
-              const SizedBox(height: 32),
-              NeumorphicButton(
+              const SizedBox(height: 28),
+              NeoBrutalButton(
                 onPressed: onButtonPressed!,
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.add),
+                    const Icon(Icons.add, size: 20),
                     const SizedBox(width: 8),
-                    Text(buttonText!, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(buttonText!),
                   ],
                 ),
               ),

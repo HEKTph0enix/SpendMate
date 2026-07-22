@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import '../models/spending_insight.dart';
-import 'neumorphic/neumorphic_card.dart';
+import '../core/theme/app_colors.dart';
+import '../core/theme/app_spacing.dart';
+import '../core/theme/app_text_styles.dart';
+import 'neobrutal/neobrutal_card.dart';
 
 class InsightBadge extends StatelessWidget {
   final SpendingInsight insight;
@@ -12,6 +15,8 @@ class InsightBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     Color bgColor;
     Color textColor;
     IconData icon;
@@ -19,36 +24,46 @@ class InsightBadge extends StatelessWidget {
     switch (insight.type) {
       case InsightType.trend:
         final isIncrease = insight.isPositiveChange;
-        bgColor = isIncrease ? Colors.red.withOpacity(0.1) : Colors.green.withOpacity(0.1);
-        textColor = isIncrease ? Colors.red : Colors.green;
+        bgColor = isIncrease
+            ? AppColors.getCardAccentColors(isDark)[5]
+            : AppColors.getCardAccentColors(isDark)[4];
+        textColor = isIncrease ? AppColors.error : AppColors.accentGreen;
         icon = isIncrease ? Icons.trending_up : Icons.trending_down;
         break;
       case InsightType.comparison:
-        bgColor = Colors.orange.withOpacity(0.1);
-        textColor = Colors.orange;
+        bgColor = AppColors.getCardAccentColors(isDark)[6];
+        textColor = AppColors.accentOrange;
         icon = Icons.compare_arrows;
         break;
       case InsightType.highValue:
       case InsightType.anomaly:
-        bgColor = Colors.purple.withOpacity(0.1);
-        textColor = Colors.purple;
+        bgColor = AppColors.getCardAccentColors(isDark)[0];
+        textColor = AppColors.accentPurple;
         icon = Icons.priority_high;
         break;
       case InsightType.recurring:
-        bgColor = Colors.blue.withOpacity(0.1);
-        textColor = Colors.blue;
+        bgColor = AppColors.getCardAccentColors(isDark)[3];
+        textColor = AppColors.accentBlue;
         icon = Icons.autorenew;
         break;
     }
 
-    return NeumorphicCard(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
-      customColor: bgColor,
+    return NeoBrutalCard(
+      margin: const EdgeInsets.only(bottom: 10),
+      backgroundColor: bgColor,
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, color: textColor, size: 24),
+          Container(
+            padding: const EdgeInsets.all(6),
+            decoration: BoxDecoration(
+              color: textColor,
+              borderRadius: BorderRadius.circular(6),
+              border:
+                  Border.all(color: AppColors.getBorder(isDark), width: 1.5),
+            ),
+            child: Icon(icon, color: Colors.white, size: 18),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -57,7 +72,7 @@ class InsightBadge extends StatelessWidget {
                 Text(
                   insight.title,
                   style: TextStyle(
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                     color: textColor,
                     fontSize: 14,
                   ),
@@ -65,10 +80,7 @@ class InsightBadge extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   insight.description,
-                  style: TextStyle(
-                    color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
-                    fontSize: 13,
-                  ),
+                  style: AppTextStyles.body(isDark),
                 ),
               ],
             ),

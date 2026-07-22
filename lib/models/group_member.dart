@@ -33,8 +33,10 @@ class GroupMember {
 
   Map<String, dynamic> toJson() => toMap();
 
-  factory GroupMember.fromJson(Map<String, dynamic> json) => GroupMember.fromMap(json);
+  factory GroupMember.fromJson(Map<String, dynamic> json) =>
+      GroupMember.fromMap(json);
 
   @override
-  String toString() => 'GroupMember(id: $id, groupId: $groupId, userId: $userId)';
+  String toString() =>
+      'GroupMember(id: $id, groupId: $groupId, userId: $userId)';
 }

@@ -54,7 +54,8 @@ class ExpenseGroup {
 
   Map<String, dynamic> toJson() => toMap();
 
-  factory ExpenseGroup.fromJson(Map<String, dynamic> json) => ExpenseGroup.fromMap(json);
+  factory ExpenseGroup.fromJson(Map<String, dynamic> json) =>
+      ExpenseGroup.fromMap(json);
 
   @override
   String toString() => 'ExpenseGroup(id: $id, name: $name)';

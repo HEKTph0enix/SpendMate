@@ -9,9 +9,13 @@ class AppSpacing {
   static const double xl = 32.0;
   static const double xxl = 48.0;
 
-  // Border Radius Constants
+  // Border Radius Constants (tighter for neobrutalism)
   static const double radiusSm = 8.0;
-  static const double radiusMd = 16.0;
-  static const double radiusLg = 24.0;
-  static const double radiusXl = 32.0;
+  static const double radiusMd = 12.0;
+  static const double radiusLg = 14.0;
+  static const double radiusXl = 16.0;
+
+  // Border Width Constants
+  static const double borderWidth = 2.0;
+  static const double borderWidthThick = 3.0;
 }

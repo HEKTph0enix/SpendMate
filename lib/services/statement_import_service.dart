@@ -23,7 +23,8 @@ class StatementImportService {
       }
 
       // Detect header row
-      final headerRow = rows.first.map((e) => e.toString().toLowerCase().trim()).toList();
+      final headerRow =
+          rows.first.map((e) => e.toString().toLowerCase().trim()).toList();
       final mapping = _detectColumnMapping(headerRow);
 
       if (mapping == null) {
@@ -72,13 +73,22 @@ class StatementImportService {
 
     for (int i = 0; i < headers.length; i++) {
       final h = headers[i];
-      if (_matchesAny(h, ['date', 'txn date', 'transaction date', 'value date', 'posting date'])) {
+      if (_matchesAny(h, [
+        'date',
+        'txn date',
+        'transaction date',
+        'value date',
+        'posting date'
+      ])) {
         dateCol ??= i;
-      } else if (_matchesAny(h, ['description', 'narration', 'particulars', 'remarks', 'details'])) {
+      } else if (_matchesAny(h,
+          ['description', 'narration', 'particulars', 'remarks', 'details'])) {
         descCol ??= i;
-      } else if (_matchesAny(h, ['debit', 'withdrawal', 'withdrawals', 'debit amount', 'dr'])) {
+      } else if (_matchesAny(
+          h, ['debit', 'withdrawal', 'withdrawals', 'debit amount', 'dr'])) {
         debitCol ??= i;
-      } else if (_matchesAny(h, ['credit', 'deposit', 'deposits', 'credit amount', 'cr'])) {
+      } else if (_matchesAny(
+          h, ['credit', 'deposit', 'deposits', 'credit amount', 'cr'])) {
         creditCol ??= i;
       }
     }
@@ -98,7 +108,8 @@ class StatementImportService {
     return candidates.any((c) => value.contains(c));
   }
 
-  app.Transaction? _parseRow(List<dynamic> row, _ColumnMapping mapping, int rowIndex) {
+  app.Transaction? _parseRow(
+      List<dynamic> row, _ColumnMapping mapping, int rowIndex) {
     if (row.length <= mapping.date) return null;
 
     // Parse date
@@ -192,10 +203,15 @@ class StatementImportService {
 
   String _detectPaymentMethod(String description) {
     final lower = description.toLowerCase();
-    if (lower.contains('upi') || lower.contains('gpay') || lower.contains('phonepe') || lower.contains('paytm')) {
+    if (lower.contains('upi') ||
+        lower.contains('gpay') ||
+        lower.contains('phonepe') ||
+        lower.contains('paytm')) {
       return 'UPI';
     }
-    if (lower.contains('neft') || lower.contains('rtgs') || lower.contains('imps')) {
+    if (lower.contains('neft') ||
+        lower.contains('rtgs') ||
+        lower.contains('imps')) {
       return 'Net Banking';
     }
     if (lower.contains('atm') || lower.contains('cash')) {

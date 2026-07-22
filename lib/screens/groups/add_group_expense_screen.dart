@@ -10,8 +10,8 @@ import '../../constants/app_constants.dart';
 import '../../constants/categories.dart';
 import '../../utils/split_calculator.dart';
 import '../../utils/validators.dart';
-import '../../widgets/neumorphic/neumorphic_text_field.dart';
-import '../../widgets/neumorphic/neumorphic_dropdown.dart';
+import '../../widgets/neobrutal/neobrutal_text_field.dart';
+import '../../widgets/neobrutal/neobrutal_dropdown.dart';
 
 class AddGroupExpenseScreen extends StatefulWidget {
   final String groupId;
@@ -22,22 +22,23 @@ class AddGroupExpenseScreen extends StatefulWidget {
   State<AddGroupExpenseScreen> createState() => _AddGroupExpenseScreenState();
 }
 
-class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen> with SingleTickerProviderStateMixin {
+class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
   final _amountController = TextEditingController();
   final _descController = TextEditingController();
-  
+
   late TabController _tabController;
-  
+
   String _selectedCategory = AppConstants.categories.first;
   String _selectedPaymentMethod = AppConstants.paymentMethods.first;
   User? _payer;
-  
+
   // Split state
   Set<String> _includedMemberIds = {};
   Map<String, TextEditingController> _customControllers = {};
   Map<String, TextEditingController> _percentControllers = {};
-  
+
   bool _isLoading = false;
   final _uuid = const Uuid();
 
@@ -48,14 +49,15 @@ class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen> with Sing
     _tabController.addListener(() {
       setState(() {}); // Re-render when tab changes
     });
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final provider = Provider.of<GroupProvider>(context, listen: false);
       if (provider.activeGroupUsers.isNotEmpty) {
         setState(() {
           _payer = provider.activeGroupUsers.first;
-          _includedMemberIds = provider.activeGroupUsers.map((u) => u.id).toSet();
-          
+          _includedMemberIds =
+              provider.activeGroupUsers.map((u) => u.id).toSet();
+
           for (var user in provider.activeGroupUsers) {
             _customControllers[user.id] = TextEditingController();
             _percentControllers[user.id] = TextEditingController();
@@ -70,25 +72,30 @@ class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen> with Sing
     _amountController.dispose();
     _descController.dispose();
     _tabController.dispose();
-    for (var c in _customControllers.values) { c.dispose(); }
-    for (var c in _percentControllers.values) { c.dispose(); }
+    for (var c in _customControllers.values) {
+      c.dispose();
+    }
+    for (var c in _percentControllers.values) {
+      c.dispose();
+    }
     super.dispose();
   }
 
   void _saveExpense() async {
     if (!_formKey.currentState!.validate()) return;
-    
+
     final totalAmount = Validators.parseAmount(_amountController.text) ?? 0.0;
     final provider = Provider.of<GroupProvider>(context, listen: false);
-    
+
     // Validate Splits
     List<GroupSplit> finalSplits = [];
     final expenseId = _uuid.v4();
-    
+
     if (_tabController.index == 0) {
       // Equal
       if (_includedMemberIds.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Select at least one member to split with.')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text('Select at least one member to split with.')));
         return;
       }
       finalSplits = SplitCalculator.calculateEqualSplit(
@@ -100,15 +107,17 @@ class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen> with Sing
       // Custom
       Map<String, double> shares = {};
       for (var id in _includedMemberIds) {
-        shares[id] = Validators.parseAmount(_customControllers[id]?.text) ?? 0.0;
+        shares[id] =
+            Validators.parseAmount(_customControllers[id]?.text) ?? 0.0;
       }
-      
+
       final error = Validators.customSplit(totalAmount, shares);
       if (error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error)));
         return;
       }
-      
+
       finalSplits = SplitCalculator.calculateCustomSplit(
         expenseId: expenseId,
         totalAmount: totalAmount,
@@ -118,15 +127,17 @@ class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen> with Sing
       // Percentage
       Map<String, double> percentages = {};
       for (var id in _includedMemberIds) {
-        percentages[id] = Validators.parseAmount(_percentControllers[id]?.text) ?? 0.0;
+        percentages[id] =
+            Validators.parseAmount(_percentControllers[id]?.text) ?? 0.0;
       }
-      
+
       final error = Validators.percentageSplit(percentages);
       if (error != null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(error)));
         return;
       }
-      
+
       finalSplits = SplitCalculator.calculatePercentageSplit(
         expenseId: expenseId,
         totalAmount: totalAmount,
@@ -187,9 +198,10 @@ class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen> with Sing
           padding: const EdgeInsets.all(16.0),
           children: [
             // Amount
-            NeumorphicTextField(
+            NeoBrutalTextField(
               controller: _amountController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               labelText: 'Total Amount',
               prefixText: '₹ ',
               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
@@ -197,9 +209,9 @@ class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen> with Sing
               onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: 16),
-            
+
             // Description
-            NeumorphicTextField(
+            NeoBrutalTextField(
               controller: _descController,
               labelText: 'Description',
               prefixIcon: const Icon(Icons.description),
@@ -207,9 +219,9 @@ class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen> with Sing
               validator: (v) => Validators.required(v, 'Description'),
             ),
             const SizedBox(height: 16),
-            
+
             // Paid By
-            NeumorphicDropdown<User>(
+            NeoBrutalDropdown<User>(
               value: _payer,
               labelText: 'Paid By',
               prefixIcon: const Icon(Icons.person),
@@ -224,9 +236,9 @@ class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen> with Sing
               },
             ),
             const SizedBox(height: 16),
-            
+
             // Category (Simplified single line scroll)
-            NeumorphicDropdown<String>(
+            NeoBrutalDropdown<String>(
               value: _selectedCategory,
               labelText: 'Category',
               prefixIcon: const Icon(Icons.category),
@@ -237,13 +249,13 @@ class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen> with Sing
                 if (v != null) setState(() => _selectedCategory = v);
               },
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // Split Options
             Text('Split Details', style: theme.textTheme.titleLarge),
             const SizedBox(height: 16),
-            
+
             TabBar(
               controller: _tabController,
               tabs: const [
@@ -252,45 +264,53 @@ class _AddGroupExpenseScreenState extends State<AddGroupExpenseScreen> with Sing
                 Tab(text: '%'),
               ],
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // Dynamic Split List based on Tab
             ...users.map((user) {
               final isIncluded = _includedMemberIds.contains(user.id);
-              
+
               Widget splitInput = const SizedBox.shrink();
-              
-              if (_tabController.index == 1) { // Exact Amount
+
+              if (_tabController.index == 1) {
+                // Exact Amount
                 splitInput = SizedBox(
                   width: 100,
-                  child: NeumorphicTextField(
+                  child: NeoBrutalTextField(
                     controller: _customControllers[user.id],
                     enabled: isIncluded,
                     keyboardType: TextInputType.number,
                     prefixText: '₹',
                     isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                   ),
                 );
-              } else if (_tabController.index == 2) { // Percentage
+              } else if (_tabController.index == 2) {
+                // Percentage
                 splitInput = SizedBox(
                   width: 80,
-                  child: NeumorphicTextField(
+                  child: NeoBrutalTextField(
                     controller: _percentControllers[user.id],
                     enabled: isIncluded,
                     keyboardType: TextInputType.number,
                     suffixText: '%',
                     isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
+                    contentPadding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                   ),
                 );
               } else {
                 // Equal split calculation for display
-                final total = Validators.parseAmount(_amountController.text) ?? 0.0;
+                final total =
+                    Validators.parseAmount(_amountController.text) ?? 0.0;
                 final count = _includedMemberIds.length;
-                final share = isIncluded && count > 0 ? (total / count).toStringAsFixed(2) : '0.00';
-                splitInput = Text('₹$share', style: theme.textTheme.titleMedium);
+                final share = isIncluded && count > 0
+                    ? (total / count).toStringAsFixed(2)
+                    : '0.00';
+                splitInput =
+                    Text('₹$share', style: theme.textTheme.titleMedium);
               }
 
               return CheckboxListTile(

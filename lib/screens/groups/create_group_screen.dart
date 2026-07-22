@@ -7,8 +7,8 @@ import '../../models/user.dart';
 import '../../providers/group_provider.dart';
 import '../../providers/settings_provider.dart';
 import '../../utils/validators.dart';
-import '../../widgets/neumorphic/neumorphic_text_field.dart';
-import '../../widgets/neumorphic/neumorphic_icon_button.dart';
+import '../../widgets/neobrutal/neobrutal_text_field.dart';
+import '../../widgets/neobrutal/neobrutal_icon_button.dart';
 
 class CreateGroupScreen extends StatefulWidget {
   final ExpenseGroup? groupToEdit;
@@ -24,7 +24,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   final _nameController = TextEditingController();
   final _descController = TextEditingController();
   final _memberController = TextEditingController();
-  
+
   final List<User> _members = [];
   bool _isLoading = false;
   final _uuid = const Uuid();
@@ -32,7 +32,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // Add current user by default
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final settings = Provider.of<SettingsProvider>(context, listen: false);
@@ -41,14 +41,15 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           _members.add(settings.currentUser!);
         });
       }
-      
+
       if (widget.groupToEdit != null) {
         _nameController.text = widget.groupToEdit!.name;
         _descController.text = widget.groupToEdit!.description ?? '';
-        
+
         // In a real app, we would fetch the actual group members here
         // For now, it relies on the group provider's active users if editing from detail screen
-        final groupProvider = Provider.of<GroupProvider>(context, listen: false);
+        final groupProvider =
+            Provider.of<GroupProvider>(context, listen: false);
         if (groupProvider.activeGroup?.id == widget.groupToEdit!.id) {
           setState(() {
             _members.clear();
@@ -70,7 +71,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
   void _addMember() {
     final name = _memberController.text.trim();
     if (name.isEmpty) return;
-    
+
     // Check for duplicates
     if (_members.any((m) => m.name.toLowerCase() == name.toLowerCase())) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -78,7 +79,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       );
       return;
     }
-    
+
     setState(() {
       _members.add(User(
         id: _uuid.v4(),
@@ -93,11 +94,12 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
     // Prevent removing current user
     if (_members[index].isCurrentUser) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You cannot remove yourself from the group')),
+        const SnackBar(
+            content: Text('You cannot remove yourself from the group')),
       );
       return;
     }
-    
+
     setState(() {
       _members.removeAt(index);
     });
@@ -119,7 +121,9 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
       final group = ExpenseGroup(
         id: widget.groupToEdit?.id ?? _uuid.v4(),
         name: _nameController.text.trim(),
-        description: _descController.text.trim().isEmpty ? null : _descController.text.trim(),
+        description: _descController.text.trim().isEmpty
+            ? null
+            : _descController.text.trim(),
         createdDate: widget.groupToEdit?.createdDate,
       );
 
@@ -168,7 +172,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
           padding: const EdgeInsets.all(16.0),
           children: [
             // Group Name
-            NeumorphicTextField(
+            NeoBrutalTextField(
               controller: _nameController,
               labelText: 'Group Name',
               prefixIcon: const Icon(Icons.group),
@@ -178,7 +182,7 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
             const SizedBox(height: 24),
 
             // Description
-            NeumorphicTextField(
+            NeoBrutalTextField(
               controller: _descController,
               labelText: 'Description (Optional)',
               prefixIcon: const Icon(Icons.description),
@@ -203,12 +207,12 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
               ],
             ),
             const SizedBox(height: 16),
-            
+
             // Add Member Input
             Row(
               children: [
                 Expanded(
-                  child: NeumorphicTextField(
+                  child: NeoBrutalTextField(
                     controller: _memberController,
                     labelText: 'Add a person',
                     hintText: 'e.g., Arun',
@@ -218,19 +222,20 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                NeumorphicIconButton(
+                NeoBrutalIconButton(
                   onPressed: _addMember,
                   icon: Icons.add,
                 ),
               ],
             ),
             const SizedBox(height: 24),
-            
+
             // Member List
             ...List.generate(_members.length, (index) {
               final member = _members[index];
               return ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
                 leading: CircleAvatar(
                   backgroundColor: theme.colorScheme.primaryContainer,
                   child: Text(
@@ -243,13 +248,13 @@ class _CreateGroupScreenState extends State<CreateGroupScreen> {
                 ),
                 title: Text(member.name),
                 subtitle: member.isCurrentUser ? const Text('You') : null,
-                trailing: member.isCurrentUser 
-                  ? null 
-                  : IconButton(
-                      icon: const Icon(Icons.remove_circle_outline),
-                      color: theme.colorScheme.error,
-                      onPressed: () => _removeMember(index),
-                    ),
+                trailing: member.isCurrentUser
+                    ? null
+                    : IconButton(
+                        icon: const Icon(Icons.remove_circle_outline),
+                        color: theme.colorScheme.error,
+                        onPressed: () => _removeMember(index),
+                      ),
               );
             }),
           ],
